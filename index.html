@@ -1358,9 +1358,44 @@ const upgradeStationColors = [0x44ff44, 0xff4444, 0x4488ff, 0xffaa00, 0xff44ff, 
 const upgradeStationIcons = ['❤️', '⚔️', '🛡️', '👟', '⚡', '💚'];
 let upgradeStations3D = [];
 let upgradeCooldowns = {};
+let upgradeLabels3D = [];
+
+function createTextSprite(text, color) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 512, 128);
+
+  // Background
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.roundRect(10, 10, 492, 108, 12);
+  ctx.fill();
+
+  // Border
+  ctx.strokeStyle = color || '#ffd700';
+  ctx.lineWidth = 3;
+  ctx.roundRect(10, 10, 492, 108, 12);
+  ctx.stroke();
+
+  // Icon + Name
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 36px Microsoft JhengHei, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(text, 256, 55);
+
+  // Canvas texture
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  const mat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(3, 0.75, 1);
+  return sprite;
+}
 
 function createUpgradeStations() {
   upgradeStations3D = [];
+  upgradeLabels3D = [];
   const baseX = 0, baseZ = -10;
   const radius = 8;
   UPGRADES.forEach((upg, i) => {
@@ -1409,11 +1444,20 @@ function createUpgradeStations() {
     glow.position.y = 0.02;
     group.add(glow);
 
+    // Create floating label
+    const label = createTextSprite('', upgradeStationColors[i]);
+    label.position.y = 3.5;
+    group.add(label);
+    upgradeLabels3D.push(label);
+
     group.position.set(x, 0, z);
     group.userData = { upgradeId: upg.id, index: i };
     scene.add(group);
     upgradeStations3D.push(group);
     upgradeCooldowns[upg.id] = 0;
+
+    // Initial label update
+    updateSingleLabel(i, upg);
   });
 }
 
@@ -1459,6 +1503,49 @@ function checkUpgradeStations() {
   for (const id in upgradeCooldowns) {
     if (upgradeCooldowns[id] > 0) upgradeCooldowns[id] -= 0.016;
   }
+}
+
+function updateSingleLabel(idx, upg) {
+  if (!upgradeLabels3D[idx]) return;
+  const label = upgradeLabels3D[idx];
+  const icon = upgradeStationIcons[idx];
+  const colorHex = '#' + upgradeStationColors[idx].toString(16).padStart(6, '0');
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 512, 128);
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  ctx.beginPath(); ctx.roundRect(8, 8, 496, 112, 12); ctx.fill();
+  ctx.strokeStyle = colorHex; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.roundRect(8, 8, 496, 112, 12); ctx.stroke();
+  ctx.textAlign = 'center';
+  if (upg.lv >= upg.maxLv) {
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 36px Microsoft JhengHei, sans-serif';
+    ctx.fillText(icon + ' ' + upg.name + ' MAX', 256, 70);
+  } else {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 28px Microsoft JhengHei, sans-serif';
+    ctx.fillText(icon + ' ' + upg.name + ' Lv.' + upg.lv, 256, 42);
+    const cost = getUpgradeCost(upg);
+    let costLine = '';
+    for (const [res, amt] of Object.entries(cost)) costLine += getResourceIcon(res) + amt + ' ';
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 22px Microsoft JhengHei, sans-serif';
+    ctx.fillText('\u9700\u8981: ' + costLine, 256, 80);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  label.material.map = texture;
+  label.material.needsUpdate = true;
+}
+
+let _labelUpdateTimer = 0;
+function updateLabels() {
+  _labelUpdateTimer += 0.016;
+  if (_labelUpdateTimer < 1) return;
+  _labelUpdateTimer = 0;
+  UPGRADES.forEach((upg, i) => { updateSingleLabel(i, upg); });
 }
 
 function showDamageNumber(pos, text, color) {
@@ -1656,8 +1743,9 @@ function gameLoop() {
     // Auto-pickup nearby resource drops
     autoPickup();
 
-    // Check upgrade stations
+    // Check upgrade stations & update labels
     checkUpgradeStations();
+    updateLabels();
   }
 
   updateHUD();
