@@ -1069,9 +1069,10 @@ function createBaseMesh() {
 const keys = {};
 let mouseX = 0, mouseY = 0;
 // 2.5D fixed isometric camera
-let cameraAngle = Math.PI * 0.75, cameraPitch = 1.05;
-let cameraDistance = 20;
+let cameraAngle = 0, cameraPitch = 1.57;
+let cameraDistance = 25;
 let is25D = true;
+let camZoom = 35;
 
 document.addEventListener('keydown', e => {
   keys[e.key.toLowerCase()] = true;
@@ -1809,20 +1810,13 @@ function updatePlayer(delta) {
     const len = Math.sqrt(dx * dx + dz * dz);
     dx /= len; dz /= len;
 
-    // 2.5D fixed isometric: map WASD to diagonal world axes
-    // cameraAngle = PI*0.75 (~135°) → camera looks from upper-right
-    // W=upper-left, S=lower-right, A=lower-left, D=upper-right
-    const cos = Math.cos(cameraAngle); // ~ -0.71
-    const sin = Math.sin(cameraAngle); // ~ +0.71
-    // For 135° isometric: rdx = -dx*cos - dz*sin, rdz = -dx*sin + dz*cos
-    const rdx = -dx * cos - dz * sin;
-    const rdz = -dx * sin + dz * cos;
-
-    playerMesh.position.x += rdx * G.moveSpeed;
-    playerMesh.position.z += rdz * G.moveSpeed;
+    // Top-down 2.5D: WASD maps directly to screen directions
+    // W=up(-Z), S=down(+Z), A=left(-X), D=right(+X)
+    playerMesh.position.x += dx * G.moveSpeed;
+    playerMesh.position.z += dz * G.moveSpeed;
 
     // Face movement direction
-    playerMesh.rotation.y = Math.atan2(rdx, rdz);
+    playerMesh.rotation.y = Math.atan2(dx, dz);
 
     // Clamp to world
     playerMesh.position.x = Math.max(-worldSize, Math.min(worldSize, playerMesh.position.x));
