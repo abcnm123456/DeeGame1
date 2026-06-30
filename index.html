@@ -1068,8 +1068,10 @@ function createBaseMesh() {
 // ==================== INPUT ====================
 const keys = {};
 let mouseX = 0, mouseY = 0;
-let cameraAngle = 0, cameraPitch = 0.6;
-let cameraDistance = 12;
+// 2.5D fixed isometric camera
+let cameraAngle = Math.PI * 0.75, cameraPitch = 1.05;
+let cameraDistance = 20;
+let is25D = true;
 
 document.addEventListener('keydown', e => {
   keys[e.key.toLowerCase()] = true;
@@ -1955,17 +1957,20 @@ function updateRegen(delta) {
 }
 
 function updateCamera() {
+  // 2.5D: fixed isometric angle, camera follows player smoothly
+  // cameraAngle stays fixed at Math.PI * 0.75, cameraPitch at ~1.05
   const targetX = playerMesh.position.x + Math.sin(cameraAngle) * cameraDistance;
   const targetZ = playerMesh.position.z + Math.cos(cameraAngle) * cameraDistance;
   const targetY = cameraPitch * cameraDistance;
 
-  camera.position.x += (targetX - camera.position.x) * 0.08;
-  camera.position.y += (targetY - camera.position.y) * 0.08;
-  camera.position.z += (targetZ - camera.position.z) * 0.08;
+  // Smooth follow (lerp)
+  camera.position.x += (targetX - camera.position.x) * 0.06;
+  camera.position.y += (targetY - camera.position.y) * 0.06;
+  camera.position.z += (targetZ - camera.position.z) * 0.06;
 
   camera.lookAt(
     playerMesh.position.x,
-    playerMesh.position.y + 1.5,
+    playerMesh.position.y + 0.5,
     playerMesh.position.z
   );
 }
