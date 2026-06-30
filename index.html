@@ -567,14 +567,14 @@
                 if(bear.userData.beingHit&&!bear.userData.dying){const t=(now-bear.userData.hitStartTime)/bear.userData.hitDuration;if(t>=1){killBear(bear);continue}const e=easeInQuad(t);bear.rotation.x=e*(Math.PI/2);bear.position.y=-e*0.5;const s=1-e*0.3;bear.scale.set(s,s,s);bear.traverse(ch=>{if(ch.isMesh&&ch.material&&!ch.userData.colorSet){ch.userData.originalColor=ch.material.color.clone();ch.userData.colorSet=true}if(ch.isMesh&&ch.userData.originalColor)ch.material.color.lerp(new THREE.Color(0xFF2222),e*0.6)});continue}
                 if(bear.userData.dying){const t=(now-bear.userData.deathStartTime)/400;if(t>=1)scene.remove(bear);else{const s=1-t;bear.scale.set(s,s,s);bear.position.y=bear.userData.deathPos.y+t*2;bear.rotation.y+=0.15}continue}
                 if(!bear.userData.chasing){bear.userData.bobPhase+=0.02;bear.position.y=Math.sin(bear.userData.bobPhase)*0.05}
-                // Billboard HP 條永遠面對鏡頭
-                if(bear.userData.hpBg){bear.userData.hpBg.quaternion.copy(camera.quaternion);bear.userData.hpFill.quaternion.copy(camera.quaternion)}
+                // Billboard HP 條永遠面對鏡頭（世界座標方向）
+                if(bear.userData.hpBg){bear.userData.hpBg.lookAt(camera.position);bear.userData.hpFill.lookAt(camera.position)}
             }
 
             // 玩家 HP 條 billboard
             if(player.userData.parts.hpBg){
-                player.userData.parts.hpBg.quaternion.copy(camera.quaternion);
-                player.userData.parts.hpFill.quaternion.copy(camera.quaternion);
+                player.userData.parts.hpBg.lookAt(camera.position);
+                player.userData.parts.hpFill.lookAt(camera.position);
             }
 
             for(let i=meatDrops.length-1;i>=0;i--){
