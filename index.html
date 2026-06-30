@@ -141,6 +141,52 @@ body { overflow: hidden; background: #1a1a2e; font-family: 'Microsoft JhengHei',
   100% { opacity: 0; transform: translateY(-60px) scale(0.5); }
 }
 
+/* Mobile Controls */
+#mobileControls {
+  display: none; position: fixed; bottom: 0; left: 0; right: 0;
+  height: 200px; z-index: 15; pointer-events: none;
+}
+.mobile-zone {
+  position: absolute; bottom: 20px; pointer-events: all;
+  display: flex; align-items: center; justify-content: center;
+}
+#joystickZone {
+  left: 20px; width: 140px; height: 140px; background: rgba(255,255,255,0.1);
+  border-radius: 50%; border: 2px solid rgba(255,255,255,0.3);
+}
+#joystickKnob {
+  width: 60px; height: 60px; background: rgba(255,215,0,0.5);
+  border-radius: 50%; border: 2px solid rgba(255,215,0,0.8);
+  position: absolute; transition: none;
+}
+#joystickZone.dragging #joystickKnob {
+  transition: none;
+}
+#mobileActions {
+  right: 15px; left: auto; width: auto; gap: 10px; bottom: 25px;
+  display: flex; flex-direction: row-reverse;
+}
+.mobile-btn {
+  width: 60px; height: 60px; border-radius: 50%; background: rgba(0,0,0,0.6);
+  border: 2px solid rgba(255,215,0,0.5); color: #fff; font-size: 22px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.mobile-btn:active { background: rgba(255,215,0,0.4); }
+#attackBtn { width: 80px; height: 80px; font-size: 28px; border-color: #ff4444; }
+#healBtn { font-size: 18px; }
+#upgradeBtnMob { font-size: 18px; }
+#cameraZone {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+}
+.autoAtkIndicator {
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,68,68,0.8); color: #fff; padding: 6px 16px;
+  border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 10;
+  pointer-events: none; display: none;
+}
+
 /* Minimap */
 #minimap {
   position: fixed; bottom: 80px; right: 20px; z-index: 10;
@@ -250,6 +296,20 @@ body { overflow: hidden; background: #1a1a2e; font-family: 'Microsoft JhengHei',
 
 <!-- Wave Info -->
 <div id="waveInfo"></div>
+
+<!-- Mobile Controls -->
+<div id="mobileControls">
+  <div id="cameraZone"></div>
+  <div class="mobile-zone" id="joystickZone">
+    <div id="joystickKnob"></div>
+  </div>
+  <div class="mobile-zone" id="mobileActions">
+    <div class="mobile-btn" id="attackBtn" ontouchstart="event.preventDefault(); attack()">⚔️</div>
+    <div class="mobile-btn" id="healBtn" ontouchstart="event.preventDefault(); healAtBase()">❤️</div>
+    <div class="mobile-btn" id="upgradeBtnMob" ontouchstart="event.preventDefault(); buildBase()">🏠</div>
+  </div>
+</div>
+<div class="autoAtkIndicator" id="autoAtkInd">⚔️ 自動攻擊中...</div>
 
 <canvas id="gameCanvas"></canvas>
 
@@ -1783,6 +1843,9 @@ function updatePlayer(delta) {
 
   // Bob animation
   playerMesh.position.y = Math.sin(Date.now() * 0.005) * 0.1;
+
+  // Mobile joystick movement
+  updatePlayerMobile();
 }
 
 function updateBears(delta) {
@@ -1967,12 +2030,153 @@ function startGame() {
 
   updateHUD();
 
-  // Request pointer lock on first click
-  document.getElementById('gameCanvas').addEventListener('click', () => {
-    if (G.running && !G.paused) {
-      document.getElementById('gameCanvas').requestPointerLock();
+  // Detect mobile
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+  if (isMobile) {
+    document.getElementById('mobileControls').style.display = 'block';
+    document.getElementById('bottomBar').style.display = 'none';
+    document.getElementById('autoAtkInd').style.display = 'block';
+    initMobileControls();
+    document.getElementById('minimap').style.bottom = '220px';
+  } else {
+    // Desktop: pointer lock
+    document.getElementById('gameCanvas').addEventListener('click', () => {
+      if (G.running && !G.paused) {
+        document.getElementById('gameCanvas').requestPointerLock();
+      }
+    });
+  }
+}
+
+// ==================== MOBILE CONTROLS ====================
+let joystickActive = false;
+let joystickTouchId = null;
+let cameraTouchId = null;
+let cameraLastX = 0, cameraLastY = 0;
+let mobileDx = 0, mobileDz = 0;
+
+function initMobileControls() {
+  const zone = document.getElementById('joystickZone');
+  const knob = document.getElementById('joystickKnob');
+  const cameraZone = document.getElementById('cameraZone');
+  const zoneRect = () => zone.getBoundingClientRect();
+  const maxDist = 40;
+
+  // Joystick touch
+  zone.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    joystickActive = true;
+    joystickTouchId = t.identifier;
+    zone.classList.add('dragging');
+  }, { passive: false });
+
+  zone.addEventListener('touchmove', e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier !== joystickTouchId) continue;
+      const rect = zoneRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      let dx = t.clientX - cx;
+      let dy = t.clientY - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > maxDist) { dx = dx / dist * maxDist; dy = dy / dist * maxDist; }
+      knob.style.transform = `translate(${dx}px, ${dy}px)`;
+      mobileDx = dx / maxDist;
+      mobileDz = dy / maxDist;
     }
-  });
+  }, { passive: false });
+
+  const endJoystick = e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === joystickTouchId) {
+        joystickActive = false;
+        joystickTouchId = null;
+        knob.style.transform = 'translate(0px, 0px)';
+        mobileDx = 0;
+        mobileDz = 0;
+        zone.classList.remove('dragging');
+      }
+    }
+  };
+  zone.addEventListener('touchend', endJoystick, { passive: false });
+  zone.addEventListener('touchcancel', endJoystick, { passive: false });
+
+  // Camera rotation via drag on background
+  cameraZone.addEventListener('touchstart', e => {
+    const t = e.changedTouches[0];
+    // Check if not on joystick or buttons
+    const target = e.target;
+    if (target.id === 'joystickZone' || target.id === 'joystickKnob'
+      || target.classList.contains('mobile-btn') || target.closest('.mobile-btn')) return;
+    cameraTouchId = t.identifier;
+    cameraLastX = t.clientX;
+    cameraLastY = t.clientY;
+  }, { passive: true });
+
+  cameraZone.addEventListener('touchmove', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier !== cameraTouchId) continue;
+      const dx = t.clientX - cameraLastX;
+      const dy = t.clientY - cameraLastY;
+      cameraAngle -= dx * 0.005;
+      cameraPitch = Math.max(0.2, Math.min(1.2, cameraPitch + dy * 0.005));
+      cameraLastX = t.clientX;
+      cameraLastY = t.clientY;
+    }
+  }, { passive: true });
+
+  cameraZone.addEventListener('touchend', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === cameraTouchId) cameraTouchId = null;
+    }
+  }, { passive: true });
+  cameraZone.addEventListener('touchcancel', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === cameraTouchId) cameraTouchId = null;
+    }
+  }, { passive: true });
+
+  // Pinch zoom
+  let pinchDist = 0;
+  document.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchDist = Math.sqrt(dx * dx + dy * dy);
+    }
+  }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const newDist = Math.sqrt(dx * dx + dy * dy);
+      cameraDistance = Math.max(6, Math.min(25, cameraDistance - (newDist - pinchDist) * 0.05));
+      pinchDist = newDist;
+    }
+  }, { passive: true });
+}
+
+function updatePlayerMobile() {
+  // Merge mobile joystick with keyboard
+  if (joystickActive) {
+    const dx = mobileDx;
+    const dz = mobileDz;
+    if (Math.abs(dx) > 0.1 || Math.abs(dz) > 0.1) {
+      const sin = Math.sin(cameraAngle);
+      const cos = Math.cos(cameraAngle);
+      const rdx = dx * cos - dz * sin;
+      const rdz = dx * sin + dz * cos;
+      playerMesh.position.x += rdx * G.moveSpeed;
+      playerMesh.position.z += rdz * G.moveSpeed;
+      playerMesh.rotation.y = Math.atan2(rdx, rdz);
+      playerMesh.position.x = Math.max(-worldSize, Math.min(worldSize, playerMesh.position.x));
+      playerMesh.position.z = Math.max(-worldSize, Math.min(worldSize, playerMesh.position.z));
+    }
+  }
 }
 
 // Start render loop
