@@ -194,8 +194,9 @@ body { overflow: hidden; background: #1a1a2e; font-family: 'Microsoft JhengHei',
   <div class="controls">
     WASD / 方向鍵 — 移動　｜　滑鼠 — 轉向<br>
     點擊 / 空白鍵 — 攻擊　｜　E — 拾取<br>
-    B — 建造基地　｜　U — 升級面板　｜　I — 背包<br>
-    R — 回基地回血　｜　數字鍵 1-5 — 切換武器
+    B — 建造基地　｜　I — 背包<br>
+    R — 回基地回血　｜　數字鍵 1-5 — 切換武器<br>
+    🟢 靠近基地周圍的升級石柱自動升級！
   </div>
 </div>
 
@@ -232,7 +233,6 @@ body { overflow: hidden; background: #1a1a2e; font-family: 'Microsoft JhengHei',
 <!-- Bottom Action Bar -->
 <div id="bottomBar" style="display:none;">
   <button class="action-btn" onclick="toggleInventory()">🎒 背包<span class="key">I</span></button>
-  <button class="action-btn" onclick="toggleUpgrade()">⬆️ 升級<span class="key">U</span></button>
   <button class="action-btn" onclick="buildBase()">🏠 建造基地<span class="key">B</span></button>
   <button class="action-btn" onclick="healAtBase()">❤️ 回基地回血<span class="key">R</span></button>
 </div>
@@ -241,13 +241,6 @@ body { overflow: hidden; background: #1a1a2e; font-family: 'Microsoft JhengHei',
 <div id="inventory">
   <div class="title">🎒 背包</div>
   <div id="invSlots"></div>
-</div>
-
-<!-- Upgrade Panel -->
-<div id="upgradePanel">
-  <div class="title">⬆️ 升級面板</div>
-  <div id="upgradeList"></div>
-  <div style="text-align:center;margin-top:12px;color:#888;font-size:11px;">按 U 或 ESC 關閉</div>
 </div>
 
 <!-- Minimap -->
@@ -1023,7 +1016,6 @@ document.addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); attack(); }
   if (e.key.toLowerCase() === 'e') pickUpNearest();
   if (e.key.toLowerCase() === 'i') toggleInventory();
-  if (e.key.toLowerCase() === 'u') toggleUpgrade();
   if (e.key.toLowerCase() === 'b') buildBase();
   if (e.key.toLowerCase() === 'r') healAtBase();
   if (e.key === 'Escape') closePanels();
@@ -1306,7 +1298,6 @@ function updateHUD() {
   }
 
   updateInventoryUI();
-  updateUpgradeUI();
 }
 
 function updateInventoryUI() {
@@ -1338,35 +1329,6 @@ function updateInventoryUI() {
   }
 }
 
-function updateUpgradeUI() {
-  const list = document.getElementById('upgradeList');
-  list.innerHTML = '';
-  UPGRADES.forEach(upg => {
-    const item = document.createElement('div');
-    item.className = 'upgrade-item';
-
-    let costStr = '';
-    const cost = getUpgradeCost(upg);
-    for (const [res, amt] of Object.entries(cost)) {
-      costStr += `${getResourceIcon(res)}${amt} `;
-    }
-
-    const canAfford = checkAfford(cost);
-
-    item.innerHTML = `
-      <div class="info">
-        <div class="name">${upg.name} Lv.${upg.lv}/${upg.maxLv}</div>
-        <div class="desc">${upg.desc}</div>
-        <div class="cost">${upg.lv >= upg.maxLv ? '已滿級' : '費用: ' + costStr}</div>
-      </div>
-      <button class="upgrade-btn" ${upg.lv >= upg.maxLv || !canAfford ? 'disabled' : ''} onclick="doUpgrade('${upg.id}')">
-        ${upg.lv >= upg.maxLv ? 'MAX' : '升級'}
-      </button>
-    `;
-    list.appendChild(item);
-  });
-}
-
 function getUpgradeCost(upg) {
   const cost = {};
   for (const [res, base] of Object.entries(upg.baseCost)) {
@@ -1382,36 +1344,121 @@ function checkAfford(cost) {
   return true;
 }
 
-window.doUpgrade = function(id) {
-  const upg = UPGRADES.find(u => u.id === id);
-  if (!upg || upg.lv >= upg.maxLv) return;
-  const cost = getUpgradeCost(upg);
-  if (!checkAfford(cost)) return;
-  for (const [res, amt] of Object.entries(cost)) {
-    G.resources[res] -= amt;
-  }
-  upg.lv++;
-  upg.effect();
-  notify(`⬆️ ${upg.name} 升至 Lv.${upg.lv}！`);
-  updateHUD();
-};
-
 function toggleInventory() {
   const inv = document.getElementById('inventory');
   inv.style.display = inv.style.display === 'none' ? 'block' : 'none';
 }
 
-function toggleUpgrade() {
-  const panel = document.getElementById('upgradePanel');
-  G.paused = panel.style.display === 'block';
-  panel.style.display = panel.style.display === 'none' || !panel.style.display ? 'block' : 'none';
-  updateUpgradeUI();
+function closePanels() {
+  document.getElementById('inventory').style.display = 'none';
 }
 
-function closePanels() {
-  document.getElementById('upgradePanel').style.display = 'none';
-  document.getElementById('inventory').style.display = 'none';
-  G.paused = false;
+// ==================== UPGRADE STATIONS (3D Ground) ====================
+const upgradeStationColors = [0x44ff44, 0xff4444, 0x4488ff, 0xffaa00, 0xff44ff, 0x44ffff];
+const upgradeStationIcons = ['❤️', '⚔️', '🛡️', '👟', '⚡', '💚'];
+let upgradeStations3D = [];
+let upgradeCooldowns = {};
+
+function createUpgradeStations() {
+  upgradeStations3D = [];
+  const baseX = 0, baseZ = -10;
+  const radius = 8;
+  UPGRADES.forEach((upg, i) => {
+    const angle = (i / UPGRADES.length) * Math.PI * 2 - Math.PI / 2;
+    const x = baseX + Math.cos(angle) * radius;
+    const z = baseZ + Math.sin(angle) * radius;
+
+    const group = new THREE.Group();
+
+    // Platform base
+    const platGeo = new THREE.CylinderGeometry(1.2, 1.4, 0.3, 8);
+    const platMat = new THREE.MeshLambertMaterial({ color: upgradeStationColors[i] });
+    const plat = new THREE.Mesh(platGeo, platMat);
+    plat.position.y = 0.15;
+    plat.castShadow = true;
+    group.add(plat);
+
+    // Pillar
+    const pillarGeo = new THREE.CylinderGeometry(0.2, 0.25, 2, 6);
+    const pillarMat = new THREE.MeshLambertMaterial({ color: 0xdddddd });
+    const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+    pillar.position.y = 1.3;
+    pillar.castShadow = true;
+    group.add(pillar);
+
+    // Glowing orb on top
+    const orbGeo = new THREE.SphereGeometry(0.3, 8, 8);
+    const orbMat = new THREE.MeshBasicMaterial({ color: upgradeStationColors[i] });
+    const orb = new THREE.Mesh(orbGeo, orbMat);
+    orb.position.y = 2.6;
+    group.add(orb);
+
+    // Ring around pillar
+    const ringGeo = new THREE.TorusGeometry(0.6, 0.05, 6, 16);
+    const ringMat = new THREE.MeshLambertMaterial({ color: upgradeStationColors[i], emissive: upgradeStationColors[i], emissiveIntensity: 0.3 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.position.y = 0.35;
+    ring.rotation.x = Math.PI / 2;
+    group.add(ring);
+
+    // Ground glow circle
+    const glowGeo = new THREE.CircleGeometry(1.5, 16);
+    const glowMat = new THREE.MeshBasicMaterial({ color: upgradeStationColors[i], transparent: true, opacity: 0.15 });
+    const glow = new THREE.Mesh(glowGeo, glowMat);
+    glow.rotation.x = -Math.PI / 2;
+    glow.position.y = 0.02;
+    group.add(glow);
+
+    group.position.set(x, 0, z);
+    group.userData = { upgradeId: upg.id, index: i };
+    scene.add(group);
+    upgradeStations3D.push(group);
+    upgradeCooldowns[upg.id] = 0;
+  });
+}
+
+function checkUpgradeStations() {
+  upgradeStations3D.forEach(station => {
+    const upg = UPGRADES.find(u => u.id === station.userData.upgradeId);
+    if (!upg) return;
+
+    const dx = station.position.x - playerMesh.position.x;
+    const dz = station.position.z - playerMesh.position.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    const idx = station.userData.index;
+
+    // Animate orb rotation
+    station.children[3].rotation.y += 0.02;
+
+    if (dist < 2.5) {
+      // Player is near this station
+      if (upg.lv < upg.maxLv) {
+        const cost = getUpgradeCost(upg);
+        if (checkAfford(cost) && (upgradeCooldowns[upg.id] || 0) <= 0) {
+          // Auto upgrade!
+          for (const [res, amt] of Object.entries(cost)) {
+            G.resources[res] -= amt;
+          }
+          upg.lv++;
+          upg.effect();
+          upgradeCooldowns[upg.id] = 2; // 2 second cooldown
+          showDamageNumber(station.position, `⬆️ Lv.${upg.lv}`, upgradeStationColors[idx]);
+          notify(`⬆️ ${upg.name} 升至 Lv.${upg.lv}！`);
+
+          // Change orb color to gold if maxed
+          if (upg.lv >= upg.maxLv) {
+            station.children[3].material.color.setHex(0xffd700);
+          }
+          updateHUD();
+        }
+      }
+    }
+  });
+
+  // Update cooldowns
+  for (const id in upgradeCooldowns) {
+    if (upgradeCooldowns[id] > 0) upgradeCooldowns[id] -= 0.016;
+  }
 }
 
 function showDamageNumber(pos, text, color) {
@@ -1608,6 +1655,9 @@ function gameLoop() {
 
     // Auto-pickup nearby resource drops
     autoPickup();
+
+    // Check upgrade stations
+    checkUpgradeStations();
   }
 
   updateHUD();
@@ -1806,6 +1856,7 @@ function startGame() {
   G.running = true;
   initThree();
   createBaseMesh();
+  createUpgradeStations();
   document.getElementById('baseInfo').style.display = 'block';
 
   // Give starting resources
