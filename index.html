@@ -547,7 +547,7 @@ function createBear(x, z, isBoss) {
 }
 
 function spawnWave() {
-  const count = 3 + G.wave * 2;
+  const count = 8 + G.wave * 5;
   const isBossWave = G.wave % 5 === 0;
 
   for (let i = 0; i < count; i++) {
@@ -1106,6 +1106,50 @@ function createParticle(x, y, z, color) {
   particles3D.push(mesh);
 }
 
+// ==================== AUTO SYSTEMS ====================
+let autoAtkCD = 0;
+function autoAttack(delta) {
+  autoAtkCD -= delta;
+  if (autoAtkCD > 0 || G.paused) return;
+  const weapon = WEAPONS[currentWeapon];
+  // Find nearest bear
+  let nearest = null, minDist = weapon.range;
+  bears.forEach(bear => {
+    if (!bear.userData.alive) return;
+    const dx = bear.position.x - playerMesh.position.x;
+    const dz = bear.position.z - playerMesh.position.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    if (dist < minDist) { minDist = dist; nearest = bear; }
+  });
+  if (nearest) {
+    // Face the bear
+    const dx = nearest.position.x - playerMesh.position.x;
+    const dz = nearest.position.z - playerMesh.position.z;
+    playerMesh.rotation.y = Math.atan2(dx, dz);
+    autoAtkCD = G.atkSpeed;
+    attack();
+  }
+}
+
+function autoPickup() {
+  const pickupRange = 5;
+  resources3D.forEach(r => {
+    if (!r.userData.alive) return;
+    const dx = r.position.x - playerMesh.position.x;
+    const dz = r.position.z - playerMesh.position.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    if (dist < pickupRange) {
+      const res = r.userData;
+      G.resources[res.resType] += res.amount;
+      showDamageNumber(r.position, `+${res.amount} ${getResourceIcon(res.resType)}`, '#ffd700');
+      r.userData.alive = false;
+      scene.remove(r);
+      addToInventory(res.resType, res.amount);
+      updateHUD();
+    }
+  });
+}
+
 // ==================== MINIMAP ====================
 function updateMinimap() {
   const canvas = document.getElementById('minimapCanvas');
@@ -1201,6 +1245,12 @@ function gameLoop() {
       G.attackCooldown -= delta;
       if (G.attackCooldown <= 0) G.canAttack = true;
     }
+
+    // Auto-attack nearest bear
+    autoAttack(delta);
+
+    // Auto-pickup nearby resource drops
+    autoPickup();
   }
 
   updateHUD();
