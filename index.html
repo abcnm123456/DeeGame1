@@ -1085,28 +1085,11 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
-document.addEventListener('mousemove', e => {
-  if (!G.running || G.paused) return;
-  if (document.pointerLockElement) {
-    cameraAngle -= e.movementX * 0.003;
-    cameraPitch = Math.max(0.2, Math.min(1.2, cameraPitch + e.movementY * 0.003));
-  }
-});
-
+// 2.5D: camera is fixed, no mouse rotation needed
 document.addEventListener('mousedown', e => {
   if (!G.running) return;
-  if (e.button === 0) {
-    const canvas = document.getElementById('gameCanvas');
-    if (!document.pointerLockElement) {
-      canvas.requestPointerLock();
-    }
-    attack();
-  }
+  if (e.button === 0) attack();
   if (e.button === 2) pickUpNearest();
-});
-
-document.addEventListener('wheel', e => {
-  cameraDistance = Math.max(6, Math.min(25, cameraDistance + e.deltaY * 0.01));
 });
 
 document.addEventListener('contextmenu', e => e.preventDefault());
