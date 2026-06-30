@@ -16,78 +16,50 @@
         #meatCount{color:#fff;font-size:22px;font-weight:bold;min-width:30px;text-align:center}
         #controls{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:100;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);padding:6px 16px;border-radius:10px;color:rgba(255,255,255,0.6);font-size:11px;pointer-events:none;border:1px solid rgba(255,255,255,0.1)}
         #controls span{color:#FFD700;font-weight:bold}
-        .hitMarker{position:fixed;pointer-events:none;z-index:200;color:#FF4444;font-size:20px;font-weight:bold;text-shadow:0 0 10px rgba(255,0,0,0.8);animation:hitFloat 0.8s forwards}
+        .hitMarker{position:fixed;pointer-events:none;z-index:200;color:#FF4444;font-size:22px;font-weight:bold;text-shadow:0 0 10px rgba(255,0,0,0.8);animation:hitFloat 0.8s forwards}
         @keyframes hitFloat{0%{transform:translateY(0) scale(0.5);opacity:1}100%{transform:translateY(-50px) scale(1.2);opacity:0}}
         #cooldownBar{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);z-index:100;pointer-events:none;width:100px;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;opacity:0;transition:opacity 0.2s}
         #cooldownBar.active{opacity:1}
         #cooldownFill{height:100%;width:100%;background:#FFD700;border-radius:2px}
         #playerHP{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:100;pointer-events:none;text-align:center}
         #playerHPBar{width:180px;height:8px;background:rgba(0,0,0,0.5);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.2)}
-        #playerHPFill{height:100%;width:100%;background:linear-gradient(90deg,#FF4444,#FF6666);transition:width 0.3s}
+        #playerHPFill{height:100%;width:100%;background:linear-gradient(90deg,#44FF44,#66FF66);transition:width 0.3s}
         #playerHPText{color:#fff;font-size:10px;margin-bottom:3px;text-shadow:0 1px 4px rgba(0,0,0,0.8)}
         #attackInfo{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:100;pointer-events:none;color:#FFD700;font-size:11px;text-shadow:0 1px 4px rgba(0,0,0,0.8)}
-        /* 升級面板 */
         #upgradePanel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);padding:30px 40px;border-radius:20px;border:2px solid #FFD700;display:none;text-align:center;color:#fff;min-width:280px}
         #upgradePanel h2{color:#FFD700;margin-bottom:10px;font-size:20px}
         #upgradePanel .stat{font-size:14px;color:#ccc;margin:6px 0}
         #upgradePanel .stat b{color:#FFD700}
-        #upgradeBtn{margin-top:15px;padding:12px 30px;border-radius:10px;background:linear-gradient(135deg,#FFD700,#FFA500);color:#333;border:none;font-size:16px;font-weight:bold;cursor:pointer;transition:transform 0.1s}
+        #upgradeBtn{margin-top:15px;padding:12px 30px;border-radius:10px;background:linear-gradient(135deg,#FFD700,#FFA500);color:#333;border:none;font-size:16px;font-weight:bold;cursor:pointer}
         #upgradeBtn:active{transform:scale(0.95)}
         #upgradeBtn:disabled{background:#666;color:#999;cursor:not-allowed}
-        #upgradeBtn .cost{color:#FF4444;font-weight:bold}
         #closeUpgrade{position:absolute;top:8px;right:12px;color:#999;font-size:18px;cursor:pointer;background:none;border:none}
-        /* 遊戲結束 */
         #gameOver{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:300;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);padding:40px 50px;border-radius:20px;border:3px solid #FF4444;display:none;text-align:center;color:#fff}
         #gameOver h1{color:#FF4444;font-size:32px;margin-bottom:10px}
         #gameOver p{font-size:16px;color:#ccc;margin:6px 0}
         #gameOver .finalScore{font-size:40px;color:#FFD700;font-weight:bold;margin:15px 0}
         #restartBtn{margin-top:15px;padding:14px 40px;border-radius:12px;background:linear-gradient(135deg,#FF4444,#CC2222);color:#fff;border:none;font-size:18px;font-weight:bold;cursor:pointer}
-        /* 升級動畫 */
         .upgradeFx{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:250;pointer-events:none;color:#FFD700;font-size:36px;font-weight:bold;text-shadow:0 0 20px #FFD700,0 0 40px #FFA500;animation:upgradePop 1.5s forwards}
         @keyframes upgradePop{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}60%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
-        /* 虛擬搖桿 */
         #joystickArea{position:fixed;bottom:20px;left:20px;width:130px;height:130px;z-index:150;display:none}
         #joystickBase{position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);top:50%;left:50%;transform:translate(-50%,-50%)}
         #joystickThumb{position:absolute;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.35);border:2px solid rgba(255,255,255,0.5);top:50%;left:50%;transform:translate(-50%,-50%)}
         #joystickLabel{position:absolute;top:-8px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.3);font-size:10px;white-space:nowrap}
         #attackBtn{position:fixed;bottom:30px;right:30px;width:70px;height:70px;border-radius:50%;z-index:150;background:rgba(255,50,50,0.3);border:3px solid rgba(255,100,100,0.6);display:none;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 20px rgba(255,0,0,0.3)}
         #attackBtn:active{transform:scale(0.9);background:rgba(255,50,50,0.6)}
-        @media(max-width:768px){
-            #joystickArea{display:block!important}#attackBtn{display:flex!important}#controls{display:none}
-            #scoreBoard{top:8px;left:8px;padding:6px 10px}#scoreBoard h2{font-size:9px}#scoreBoard .score{font-size:18px}
-            #ui{top:8px;right:8px;padding:6px 10px;gap:6px}#backpack{width:32px;height:32px;font-size:16px}#meatCount{font-size:18px}
-        }
-        @media(hover:none)and(pointer:coarse){
-            #joystickArea{display:block!important}#attackBtn{display:flex!important}#controls{display:none}
-        }
+        @media(max-width:768px){#joystickArea{display:block!important}#attackBtn{display:flex!important}#controls{display:none}}
+        @media(hover:none)and(pointer:coarse){#joystickArea{display:block!important}#attackBtn{display:flex!important}#controls{display:none}}
     </style>
 </head>
 <body>
     <div id="scoreBoard"><h2>獵殺數</h2><div class="score" id="killCount">0</div></div>
     <div id="ui"><div id="backpack">🎒</div><span>🥩</span><span id="meatCount">0</span></div>
-    <div id="controls"><span>WASD</span> 移動 ｜ <span>E</span> 升級 ｜ 靠近熊自動攻擊</div>
+    <div id="controls"><span>WASD</span> 移動 ｜ <span>E</span> 升級 ｜ 靠近熊自動攻擊 ｜ 範圍攻擊！</div>
     <div id="attackInfo"></div>
-    <div id="playerHP"><div id="playerHPText">HP: 100/100</div><div id="playerHPBar"><div id="playerHPFill"></div></div></div>
+    <div id="playerHP"><div id="playerHPText">HP: 100/100  ATK: 15</div><div id="playerHPBar"><div id="playerHPFill"></div></div></div>
     <div id="cooldownBar"><div id="cooldownFill"></div></div>
-
-    <div id="upgradePanel">
-        <button id="closeUpgrade" onclick="closeUpgradePanel()">✕</button>
-        <h2>⚒️ 武器升級台</h2>
-        <div class="stat">等級: <b id="upgLevel">1</b></div>
-        <div class="stat">攻擊力: <b id="upgAtk">10</b></div>
-        <div class="stat">熊肉: <b id="upgMeat">0</b></div>
-        <div class="stat" style="margin-top:8px;color:#aaa">下次升級需要: <span id="upgCost" style="color:#FF4444;font-weight:bold">5</span> 🥩</div>
-        <button id="upgradeBtn" onclick="doUpgrade()">升級 (5 🥩)</button>
-    </div>
-
-    <div id="gameOver">
-        <h1>💀 死亡</h1>
-        <p>你被熊擊敗了...</p>
-        <div class="finalScore" id="finalScore">0</div>
-        <p>收集的肉</p>
-        <button id="restartBtn" onclick="restartGame()">重新開始</button>
-    </div>
-
+    <div id="upgradePanel"><button id="closeUpgrade" onclick="closeUpgradePanel()">✕</button><h2>⚒️ 武器升級台</h2><div class="stat">等級: <b id="upgLevel">1</b></div><div class="stat">攻擊力: <b id="upgAtk">15</b></div><div class="stat">熊肉: <b id="upgMeat">0</b></div><div class="stat" style="margin-top:8px;color:#aaa">下次升級: <span id="upgCost" style="color:#FF4444;font-weight:bold">5</span> 🥩</div><button id="upgradeBtn" onclick="doUpgrade()">升級 (5 🥩)</button></div>
+    <div id="gameOver"><h1>💀 死亡</h1><p>你被熊擊敗了...</p><div class="finalScore" id="finalScore">0</div><p>收集的肉</p><button id="restartBtn" onclick="restartGame()">重新開始</button></div>
     <div id="joystickArea"><div id="joystickLabel">移動</div><div id="joystickBase"></div><div id="joystickThumb"></div></div>
     <div id="attackBtn">⚔️</div>
 
@@ -95,306 +67,341 @@
     <script type="module">
         import * as THREE from 'three';
 
-        // ============ 全域變數 ============
-        let scene, camera, renderer, raycaster, mouse;
-        let bears = [], meatDrops = [], enemies = [];
-        let player, keys = {};
-        const GROUND_SIZE = 60;
-        const PLAYER_SPEED = 12;
-        const CAMERA_HEIGHT = 15;
-        const CAMERA_DISTANCE = 18;
-        const SPAWN_DELAY = 0.5;
-        const FLY_DURATION = 1.0;
-        let ATTACK_RANGE = 1.5;
-        const ATTACK_COOLDOWN = 1000;
-        let lastAttackTime = 0, isAttacking = false;
-        let cameraAngle = 0, cameraPitch = 0.7;
+        let scene,camera,renderer,raycaster,mouse;
+        let bears=[],meatDrops=[];
+        let player,keys={};
+        const GROUND_SIZE=60;
+        const PLAYER_SPEED=12;
+        const CAMERA_HEIGHT=15;
+        const CAMERA_DISTANCE=18;
+        const SPAWN_DELAY=0.5;
+        const FLY_DURATION=1.0;
+        let ATTACK_RANGE=2;
+        const ATTACK_COOLDOWN=1000;
+        let lastAttackTime=0,isAttacking=false;
+        let cameraAngle=0,cameraPitch=0.7;
+        let joystickInput={x:0,y:0},isJoystickActive=false;
+        let joystickTouchId=null,cameraTouchId=null;
+        let lastCameraTouchX=0,lastCameraTouchY=0;
+        let playerHP=100,playerMaxHP=100,playerATK=15;
+        let upgradeLevel=1,upgradeCost=5,totalMeat=0;
+        let nearUpgradeStation=false,gameIsOver=false;
+        let upgradeStation,upgradeCostLabel;
 
-        // 觸控
-        let joystickInput = {x:0,y:0}, isJoystickActive = false;
-        let joystickTouchId = null, cameraTouchId = null;
-        let lastCameraTouchX = 0, lastCameraTouchY = 0;
-
-        // 遊戲狀態
-        let playerHP = 100, playerMaxHP = 100, playerATK = 10;
-        let upgradeLevel = 1, upgradeCost = 5, totalMeat = 0;
-        let nearUpgradeStation = false;
-        let gameIsOver = false;
-        let upgradeStation;
-
-        // ============ 初始化 ============
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87CEEB);
-            scene.fog = new THREE.FogExp2(0x87CEEB, 0.008);
-
-            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 300);
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.1;
+        function init(){
+            scene=new THREE.Scene();
+            scene.background=new THREE.Color(0x87CEEB);
+            scene.fog=new THREE.FogExp2(0x87CEEB,0.008);
+            camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,300);
+            renderer=new THREE.WebGLRenderer({antialias:true});
+            renderer.setSize(innerWidth,innerHeight);
+            renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+            renderer.shadowMap.enabled=true;
+            renderer.toneMapping=THREE.ACESFilmicToneMapping;
             document.body.appendChild(renderer.domElement);
-
-            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-            const sun = new THREE.DirectionalLight(0xfff4e0, 1.2);
-            sun.position.set(20, 35, 15); sun.castShadow = true;
-            sun.shadow.mapSize.set(2048, 2048);
-            const d = 45; sun.shadow.camera.left = -d; sun.shadow.camera.right = d; sun.shadow.camera.top = d; sun.shadow.camera.bottom = -d;
-            sun.shadow.camera.near = 0.5; sun.shadow.camera.far = 100; sun.shadow.bias = -0.001;
-            scene.add(sun);
-            scene.add(new THREE.HemisphereLight(0x87CEEB, 0x4a7023, 0.35));
-
-            createGround();
-            createTrees();
-            createRocks();
-            createFlowers();
-            createUpgradeStation();
-
-            player = createPlayer();
-            player.position.set(0, 0, 5);
-            scene.add(player);
-
-            raycaster = new THREE.Raycaster();
-            mouse = new THREE.Vector2();
-
-            for (let i = 0; i < 5; i++) spawnBear();
-
-            window.addEventListener('resize', onResize);
-            window.addEventListener('keydown', e => {
-                keys[e.key.toLowerCase()] = true;
-                if (e.key.toLowerCase() === 'e' && nearUpgradeStation) toggleUpgradePanel();
-            });
-            window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
-            renderer.domElement.addEventListener('contextmenu', e => e.preventDefault());
-            setupTouchControls();
-            animate();
+            scene.add(new THREE.AmbientLight(0xffffff,0.5));
+            const sun=new THREE.DirectionalLight(0xfff4e0,1.2);
+            sun.position.set(20,35,15);sun.castShadow=true;
+            sun.shadow.mapSize.set(2048,2048);
+            const dd=45;sun.shadow.camera.left=-dd;sun.shadow.camera.right=dd;sun.shadow.camera.top=dd;sun.shadow.camera.bottom=-dd;
+            sun.shadow.camera.near=0.5;sun.shadow.camera.far=100;sun.shadow.bias=-0.001;
+            scene.add(sun);scene.add(new THREE.HemisphereLight(0x87CEEB,0x4a7023,0.35));
+            createGround();createTrees();createRocks();createFlowers();createUpgradeStation();
+            player=createPlayer();player.position.set(0,0,5);scene.add(player);
+            raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
+            for(let i=0;i<8;i++)spawnBear();
+            addEventListener('resize',onResize);
+            addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key.toLowerCase()==='e'&&nearUpgradeStation)toggleUpgradePanel()});
+            addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+            renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+            setupTouchControls();animate();
         }
 
-        // ============ 升級台 ============
-        function createUpgradeStation() {
-            upgradeStation = new THREE.Group();
+        // ============ 升級台 + 欄柵 ============
+        function createUpgradeStation(){
+            upgradeStation=new THREE.Group();
             // 底座
-            const base = new THREE.Mesh(new THREE.CylinderGeometry(2, 2.5, 0.8, 8), new THREE.MeshLambertMaterial({ color: 0x888888 }));
-            base.position.y = 0.4; base.castShadow = true; base.receiveShadow = true;
-            upgradeStation.add(base);
+            const base=new THREE.Mesh(new THREE.CylinderGeometry(2.5,3,0.8,8),new THREE.MeshLambertMaterial({color:0x888888}));
+            base.position.y=0.4;base.castShadow=true;base.receiveShadow=true;upgradeStation.add(base);
             // 鐵砧
-            const anvil = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1, 1.2), new THREE.MeshLambertMaterial({ color: 0x555555 }));
-            anvil.position.y = 1.3; anvil.castShadow = true;
-            upgradeStation.add(anvil);
+            const anvil=new THREE.Mesh(new THREE.BoxGeometry(1.2,1,1.2),new THREE.MeshLambertMaterial({color:0x555555}));
+            anvil.position.y=1.3;anvil.castShadow=true;upgradeStation.add(anvil);
             // 發光環
-            const ring = new THREE.Mesh(new THREE.RingGeometry(2.2, 2.8, 32), new THREE.MeshBasicMaterial({ color: 0xFFD700, transparent: true, opacity: 0.3, side: THREE.DoubleSide }));
-            ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05;
-            upgradeStation.add(ring);
-            upgradeStation.userData.ring = ring;
+            const ring=new THREE.Mesh(new THREE.RingGeometry(2.8,3.4,32),new THREE.MeshBasicMaterial({color:0xFFD700,transparent:true,opacity:0.3,side:THREE.DoubleSide}));
+            ring.rotation.x=-Math.PI/2;ring.position.y=0.05;upgradeStation.add(ring);upgradeStation.userData.ring=ring;
             // 光柱
-            const glow = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.5, 5, 8), new THREE.MeshBasicMaterial({ color: 0xFFD700, transparent: true, opacity: 0.15 }));
-            glow.position.y = 3.5;
-            upgradeStation.add(glow);
-            upgradeStation.userData.glow = glow;
-            // 顯示等級數字 - 用一個小方塊標示
-            const sign = new THREE.Mesh(new THREE.BoxGeometry(2, 1.2, 0.1), new THREE.MeshLambertMaterial({ color: 0x222222 }));
-            sign.position.set(0, 3, -1.5);
-            upgradeStation.add(sign);
+            const glow=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.6,5,8),new THREE.MeshBasicMaterial({color:0xFFD700,transparent:true,opacity:0.12}));
+            glow.position.y=3.5;upgradeStation.add(glow);upgradeStation.userData.glow=glow;
 
-            upgradeStation.position.set(0, 0, 0);
+            // ============ 欄柵圍住基地 ============
+            const fenceMat=new THREE.MeshLambertMaterial({color:0x8B6914});
+            const fenceRadius=4.5;
+            const postCount=16;
+            for(let i=0;i<postCount;i++){
+                const angle=(i/postCount)*Math.PI*2;
+                const px=Math.cos(angle)*fenceRadius;
+                const pz=Math.sin(angle)*fenceRadius;
+                // 柵欄柱
+                const post=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,1.8,6),fenceMat);
+                post.position.set(px,0.9,pz);post.castShadow=true;upgradeStation.add(post);
+                // 橫木（下層）
+                if(i>0){
+                    const prevAngle=((i-1)/postCount)*Math.PI*2;
+                    const midAngle=(angle+prevAngle)/2;
+                    const mx=Math.cos(midAngle)*fenceRadius;
+                    const mz=Math.sin(midAngle)*fenceRadius;
+                    const dx=px-Math.cos(prevAngle)*fenceRadius;
+                    const dz=pz-Math.sin(prevAngle)*fenceRadius;
+                    const len=Math.sqrt(dx*dx+dz*dz);
+                    const rail=new THREE.Mesh(new THREE.BoxGeometry(len,0.08,0.06),fenceMat);
+                    rail.position.set(mx,0.5,mz);
+                    rail.rotation.y=-Math.atan2(dz,dx);
+                    upgradeStation.add(rail);
+                    // 橫木（上層）
+                    const rail2=new THREE.Mesh(new THREE.BoxGeometry(len,0.08,0.06),fenceMat);
+                    rail2.position.set(mx,1.3,mz);
+                    rail2.rotation.y=-Math.atan2(dz,dx);
+                    upgradeStation.add(rail2);
+                }
+            }
+
+            // 3D 升級花費標示（用方塊拼數字）
+            const labelGroup=new THREE.Group();
+            // 底板
+            const signBoard=new THREE.Mesh(new THREE.BoxGeometry(2.5,1.5,0.1),new THREE.MeshLambertMaterial({color:0x333333}));
+            signBoard.position.y=2.5;labelGroup.add(signBoard);
+            // ⚒️ 圖示方塊
+            const toolBlock=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,0.12),new THREE.MeshLambertMaterial({color:0xFFD700}));
+            toolBlock.position.set(-0.8,2.9,0.08);labelGroup.add(toolBlock);
+            const toolBlock2=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.1,0.12),new THREE.MeshLambertMaterial({color:0xAAAAAA}));
+            toolBlock2.position.set(-0.8,2.65,0.08);labelGroup.add(toolBlock2);
+            // 🔴 肉圖示
+            const meatIcon=new THREE.Mesh(new THREE.BoxGeometry(0.25,0.25,0.12),new THREE.MeshLambertMaterial({color:0xCC2222}));
+            meatIcon.position.set(0.6,2.8,0.08);labelGroup.add(meatIcon);
+            const meatIcon2=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.18,0.12),new THREE.MeshLambertMaterial({color:0xEE3333}));
+            meatIcon2.position.set(0.75,2.92,0.08);labelGroup.add(meatIcon2);
+            // = 號
+            const eqSign=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.08,0.12),new THREE.MeshLambertMaterial({color:0xFFFFFF}));
+            eqSign.position.set(0,2.75,0.08);labelGroup.add(eqSign);
+
+            labelGroup.position.set(0,0,-2.5);
+            upgradeStation.add(labelGroup);
+            upgradeStation.userData.labelGroup=labelGroup;
+
+            upgradeStation.position.set(0,0,0);
             scene.add(upgradeStation);
+
+            // 建立 Canvas 紋理顯示花費數字
+            createCostLabel();
+        }
+
+        function createCostLabel(){
+            const canvas=document.createElement('canvas');
+            canvas.width=256;canvas.height=128;
+            const ctx=canvas.getContext('2d');
+            ctx.fillStyle='rgba(0,0,0,0.8)';
+            ctx.beginPath();ctx.roundRect(0,0,256,128,12);ctx.fill();
+            ctx.fillStyle='#FFD700';ctx.font='bold 50px Arial';ctx.textAlign='center';
+            ctx.fillText(upgradeCost,128,50);
+            ctx.fillStyle='#FF6666';ctx.font='30px Arial';
+            ctx.fillText('🥩',128,95);
+
+            const tex=new THREE.CanvasTexture(canvas);
+            const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide});
+            const geo=new THREE.PlaneGeometry(2.5,1.2);
+            if(upgradeCostLabel){
+                upgradeCostLabel.material.map=tex;
+                upgradeCostLabel.material.needsUpdate=true;
+                return;
+            }
+            upgradeCostLabel=new THREE.Mesh(geo,mat);
+            upgradeCostLabel.position.set(0,2.5,0.06);
+            upgradeStation.add(upgradeCostLabel);
+        }
+
+        function updateCostLabel(){
+            const canvas=document.createElement('canvas');
+            canvas.width=256;canvas.height=128;
+            const ctx=canvas.getContext('2d');
+            ctx.fillStyle='rgba(0,0,0,0.85)';
+            ctx.beginPath();ctx.roundRect(0,0,256,128,12);ctx.fill();
+            ctx.fillStyle='#FFD700';ctx.font='bold 60px Arial';ctx.textAlign='center';
+            ctx.fillText(upgradeCost+'',128,60);
+            ctx.fillStyle='#FF8888';ctx.font='28px Arial';
+            ctx.fillText('升級肉量',128,105);
+            const tex=new THREE.CanvasTexture(canvas);
+            upgradeCostLabel.material.map=tex;
+            upgradeCostLabel.material.needsUpdate=true;
         }
 
         // ============ 玩家角色 ============
-        function createPlayer() {
-            const g = new THREE.Group();
-            const bodyMat = new THREE.MeshLambertMaterial({ color: 0x2266CC });
-            const skinMat = new THREE.MeshLambertMaterial({ color: 0xFFD5B0 });
-            const hairMat = new THREE.MeshLambertMaterial({ color: 0x332211 });
-            const pantsMat = new THREE.MeshLambertMaterial({ color: 0x334455 });
-            const shoeMat = new THREE.MeshLambertMaterial({ color: 0x553322 });
+        function createPlayer(){
+            const g=new THREE.Group();
+            const bodyMat=new THREE.MeshLambertMaterial({color:0x2266CC});
+            const skinMat=new THREE.MeshLambertMaterial({color:0xFFD5B0});
+            const hairMat=new THREE.MeshLambertMaterial({color:0x332211});
+            const pantsMat=new THREE.MeshLambertMaterial({color:0x334455});
+            const shoeMat=new THREE.MeshLambertMaterial({color:0x553322});
 
-            const head = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.7), skinMat); head.position.y=2.2; head.castShadow=true; g.add(head);
-            const hair = new THREE.Mesh(new THREE.BoxGeometry(0.75,0.35,0.75), hairMat); hair.position.y=2.55; hair.castShadow=true; g.add(hair);
-            const eyeMat = new THREE.MeshLambertMaterial({color:0x111111});
+            const head=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.7),skinMat);head.position.y=2.2;head.castShadow=true;g.add(head);
+            const hair=new THREE.Mesh(new THREE.BoxGeometry(0.75,0.35,0.75),hairMat);hair.position.y=2.55;hair.castShadow=true;g.add(hair);
+            const eyeMat=new THREE.MeshLambertMaterial({color:0x111111});
             [[-0.15,2.25,0.36],[0.15,2.25,0.36]].forEach(p=>{const e=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.05),eyeMat);e.position.set(...p);g.add(e)});
-            const ewMat = new THREE.MeshLambertMaterial({color:0xffffff});
+            const ewMat=new THREE.MeshLambertMaterial({color:0xffffff});
             [[-0.15,2.28,0.37],[0.15,2.28,0.37]].forEach(p=>{const e=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.14,0.03),ewMat);e.position.set(...p);g.add(e)});
-            const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.2,0.06,0.05), new THREE.MeshLambertMaterial({color:0xCC6666})); mouth.position.set(0,2.08,0.36); g.add(mouth);
+            g.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(0.2,0.06,0.05),new THREE.MeshLambertMaterial({color:0xCC6666})),{position:new THREE.Vector3(0,2.08,0.36)}));
 
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.8,1.0,0.5), bodyMat); body.position.y=1.45; body.castShadow=true; g.add(body);
-            const armL = new THREE.Mesh(new THREE.BoxGeometry(0.25,0.85,0.25), bodyMat); armL.position.set(-0.53,1.5,0); armL.castShadow=true; g.add(armL);
-            const armR = new THREE.Mesh(new THREE.BoxGeometry(0.25,0.85,0.25), bodyMat); armR.position.set(0.53,1.5,0); armR.castShadow=true; g.add(armR);
+            const body=new THREE.Mesh(new THREE.BoxGeometry(0.8,1.0,0.5),bodyMat);body.position.y=1.45;body.castShadow=true;g.add(body);
+            const armL=new THREE.Mesh(new THREE.BoxGeometry(0.25,0.85,0.25),bodyMat);armL.position.set(-0.53,1.5,0);armL.castShadow=true;g.add(armL);
+            const armR=new THREE.Mesh(new THREE.BoxGeometry(0.25,0.85,0.25),bodyMat);armR.position.set(0.53,1.5,0);armR.castShadow=true;g.add(armR);
             [[-0.53,1.02,0],[0.53,1.02,0]].forEach(p=>{const h=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.2,0.2),skinMat);h.position.set(...p);g.add(h)});
-            const legL = new THREE.Mesh(new THREE.BoxGeometry(0.32,0.7,0.32), pantsMat); legL.position.set(-0.2,0.55,0); legL.castShadow=true; g.add(legL);
-            const legR = new THREE.Mesh(new THREE.BoxGeometry(0.32,0.7,0.32), pantsMat); legR.position.set(0.2,0.55,0); legR.castShadow=true; g.add(legR);
+            const legL=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.7,0.32),pantsMat);legL.position.set(-0.2,0.55,0);legL.castShadow=true;g.add(legL);
+            const legR=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.7,0.32),pantsMat);legR.position.set(0.2,0.55,0);legR.castShadow=true;g.add(legR);
             [[-0.2,0.1,0.04],[0.2,0.1,0.04]].forEach(p=>{const s=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.18,0.42),shoeMat);s.position.set(...p);g.add(s)});
 
             // 斧頭
-            const axeGroup = new THREE.Group();
-            const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.7,6), new THREE.MeshLambertMaterial({color:0x8B6914}));
-            handle.rotation.z=0.3; axeGroup.add(handle);
-            const blade = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.25,0.06), new THREE.MeshLambertMaterial({color:0xAAAAAA}));
-            blade.position.set(0.15,0.3,0); axeGroup.add(blade);
-            axeGroup.position.set(0.72,1.7,0); g.add(axeGroup);
+            const axeGroup=new THREE.Group();
+            const handle=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.7,6),new THREE.MeshLambertMaterial({color:0x8B6914}));
+            handle.rotation.z=0.3;axeGroup.add(handle);
+            const blade=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.25,0.06),new THREE.MeshLambertMaterial({color:0xAAAAAA}));
+            blade.position.set(0.15,0.3,0);axeGroup.add(blade);
+            axeGroup.position.set(0.72,1.7,0);g.add(axeGroup);
 
-            // HP 條在頭上
-            const hpBg = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.15), new THREE.MeshBasicMaterial({color:0x333333, side:THREE.DoubleSide}));
-            hpBg.position.y = 3.3; hpBg.name = 'hpBg'; g.add(hpBg);
-            const hpFill = new THREE.Mesh(new THREE.PlaneGeometry(1.18, 0.13), new THREE.MeshBasicMaterial({color:0x44FF44, side:THREE.DoubleSide}));
-            hpFill.position.y = 3.3; hpFill.position.z = 0.01; hpFill.name = 'hpFill'; g.add(hpFill);
-
-            g.userData.parts = { armL, armR, legL, legR, axeGroup, hpFill };
+            // 玩家 HP 條（3D billboard）
+            const hpBg=new THREE.Mesh(new THREE.PlaneGeometry(1.2,0.15),new THREE.MeshBasicMaterial({color:0x333333,side:THREE.DoubleSide}));
+            hpBg.position.y=3.3;g.add(hpBg);
+            const hpFill=new THREE.Mesh(new THREE.PlaneGeometry(1.18,0.13),new THREE.MeshBasicMaterial({color:0x44FF44,side:THREE.DoubleSide}));
+            hpFill.position.y=3.3;hpFill.position.z=0.01;g.add(hpFill);
+            g.userData.parts={armL,armR,legL,legR,axeGroup,hpFill,hpBg};
             return g;
         }
 
-        // ============ 场景 ============
-        function createGround() {
-            const g = new THREE.Mesh(new THREE.PlaneGeometry(GROUND_SIZE,GROUND_SIZE,60,60), new THREE.MeshLambertMaterial({color:0x4a7023}));
-            g.rotation.x=-Math.PI/2; g.receiveShadow=true; scene.add(g);
-            const pColors=[0x5a8a2a,0x3d6018,0x6a9a35,0x528020];
-            for(let i=0;i<60;i++){const pm=new THREE.Mesh(new THREE.CircleGeometry(1+Math.random()*2,8),new THREE.MeshLambertMaterial({color:pColors[i%4]}));pm.rotation.x=-Math.PI/2;pm.position.set((Math.random()-0.5)*GROUND_SIZE*0.9,0.01,(Math.random()-0.5)*GROUND_SIZE*0.9);pm.scale.set(0.8+Math.random(),0.8+Math.random(),1);scene.add(pm)}
+        // ============ 場景 ============
+        function createGround(){
+            const g=new THREE.Mesh(new THREE.PlaneGeometry(GROUND_SIZE,GROUND_SIZE,60,60),new THREE.MeshLambertMaterial({color:0x4a7023}));
+            g.rotation.x=-Math.PI/2;g.receiveShadow=true;scene.add(g);
+            const pc=[0x5a8a2a,0x3d6018,0x6a9a35,0x528020];
+            for(let i=0;i<60;i++){const pm=new THREE.Mesh(new THREE.CircleGeometry(1+Math.random()*2,8),new THREE.MeshLambertMaterial({color:pc[i%4]}));pm.rotation.x=-Math.PI/2;pm.position.set((Math.random()-0.5)*GROUND_SIZE*0.9,0.01,(Math.random()-0.5)*GROUND_SIZE*0.9);pm.scale.set(0.8+Math.random(),0.8+Math.random(),1);scene.add(pm)}
         }
         function createTrees(){const ps=[[-20,0,-18],[-22,0,8],[20,0,-14],[18,0,20],[-12,0,24],[22,0,5],[-24,0,-6],[10,0,-26],[-8,0,28],[26,0,-3],[-26,0,15],[0,0,-28],[14,0,26],[-18,0,-22],[24,0,18],[-28,0,0],[8,0,-28],[-28,0,-15]];ps.forEach(([x,y,z])=>{const t=new THREE.Group();const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.4,3,8),new THREE.MeshLambertMaterial({color:0x6B3A1F}));trunk.position.y=1.5;trunk.castShadow=true;t.add(trunk);[0x228B22,0x2E8B2E,0x1E7A1E].forEach((c,i)=>{const lf=new THREE.Mesh(new THREE.SphereGeometry(1.2-i*0.2,8,8),new THREE.MeshLambertMaterial({color:c}));lf.position.set([0,-0.5,0.4][i],[4,3.5,3.6][i],[0,0.3,-0.3][i]);lf.castShadow=true;t.add(lf)});t.position.set(x,y,z);scene.add(t)})}
-        function createRocks(){for(let i=0;i<18;i++){const a=Math.random()*Math.PI*2,d=5+Math.random()*22;const r=new THREE.Mesh(new THREE.DodecahedronGeometry(0.3+Math.random()*0.5,0),new THREE.MeshLambertMaterial({color:new THREE.Color(0.4+Math.random()*0.2,0.4+Math.random()*0.2,0.38+Math.random()*0.15)}));r.position.set(Math.cos(a)*d,0.15,Math.sin(a)*d);r.rotation.set(Math.random(),Math.random(),Math.random());r.castShadow=true;scene.add(r)}}
-        function createFlowers(){const cs=[0xFF69B4,0xFFD700,0xFF6347,0xDA70D6,0x87CEEB,0xFFFFFF];for(let i=0;i<50;i++){const f=new THREE.Group();const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.4,4),new THREE.MeshLambertMaterial({color:0x228B22}));stem.position.y=0.2;f.add(stem);const petal=new THREE.Mesh(new THREE.SphereGeometry(0.12,6,6),new THREE.MeshLambertMaterial({color:cs[Math.floor(Math.random()*cs.length)]}));petal.position.y=0.45;petal.scale.y=0.6;f.add(petal);const a=Math.random()*Math.PI*2,d=3+Math.random()*24;f.position.set(Math.cos(a)*d,0,Math.sin(a)*d);scene.add(f)}}
+        function createRocks(){for(let i=0;i<18;i++){const a=Math.random()*Math.PI*2,d=8+Math.random()*20;const r=new THREE.Mesh(new THREE.DodecahedronGeometry(0.3+Math.random()*0.5,0),new THREE.MeshLambertMaterial({color:new THREE.Color(0.4+Math.random()*0.2,0.4+Math.random()*0.2,0.38+Math.random()*0.15)}));r.position.set(Math.cos(a)*d,0.15,Math.sin(a)*d);r.rotation.set(Math.random(),Math.random(),Math.random());r.castShadow=true;scene.add(r)}}
+        function createFlowers(){const cs=[0xFF69B4,0xFFD700,0xFF6347,0xDA70D6,0x87CEEB,0xFFFFFF];for(let i=0;i<50;i++){const f=new THREE.Group();f.add(new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.4,4),new THREE.MeshLambertMaterial({color:0x228B22})));f.children[0].position.y=0.2;const petal=new THREE.Mesh(new THREE.SphereGeometry(0.12,6,6),new THREE.MeshLambertMaterial({color:cs[Math.floor(Math.random()*cs.length)]}));petal.position.y=0.45;petal.scale.y=0.6;f.add(petal);const a=Math.random()*Math.PI*2,d=6+Math.random()*22;f.position.set(Math.cos(a)*d,0,Math.sin(a)*d);scene.add(f)}}
 
         // ============ 熊 ============
-        function createBear(hpBonus) {
-            const bear = new THREE.Group();
+        function createBear(hpBonus){
+            const bear=new THREE.Group();
             const bc=0x8B4513,hc=0x9B5523,bc2=0xD2B48C;
             const body=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.4,1.2),new THREE.MeshLambertMaterial({color:bc}));body.position.y=1.3;body.castShadow=true;bear.add(body);
-            const belly=new THREE.Mesh(new THREE.BoxGeometry(1.0,0.9,0.1),new THREE.MeshLambertMaterial({color:bc2}));belly.position.set(0,1.2,0.65);bear.add(belly);
+            bear.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1.0,0.9,0.1),new THREE.MeshLambertMaterial({color:bc2})),{position:new THREE.Vector3(0,1.2,0.65)}));
             const head=new THREE.Mesh(new THREE.BoxGeometry(1.2,1.1,1.0),new THREE.MeshLambertMaterial({color:hc}));head.position.y=2.55;head.castShadow=true;bear.add(head);
             [[-0.45,3.1,0],[0.45,3.1,0]].forEach(p=>{const e=new THREE.Mesh(new THREE.SphereGeometry(0.3,8,8),new THREE.MeshLambertMaterial({color:hc}));e.position.set(...p);e.castShadow=true;bear.add(e)});
-            [[-0.25,2.65,0.5],[0.25,2.65,0.5]].forEach(p=>{const e=new THREE.Mesh(new THREE.SphereGeometry(0.1,6,6),new THREE.MeshLambertMaterial({color:0x111111}));e.position.set(...p);bear.add(e)});
-            [[-0.23,2.68,0.56],[0.27,2.68,0.56]].forEach(p=>{const e=new THREE.Mesh(new THREE.SphereGeometry(0.06,6,6),new THREE.MeshLambertMaterial({color:0xffffff}));e.position.set(...p);bear.add(e)});
-            const nose=new THREE.Mesh(new THREE.BoxGeometry(0.25,0.15,0.15),new THREE.MeshLambertMaterial({color:0x222222}));nose.position.set(0,2.45,0.55);bear.add(nose);
+            [[-0.25,2.65,0.5],[0.25,2.65,0.5]].forEach(p=>{bear.add(Object.assign(new THREE.Mesh(new THREE.SphereGeometry(0.1,6,6),new THREE.MeshLambertMaterial({color:0x111111})),{position:new THREE.Vector3(...p)}))});
+            [[-0.23,2.68,0.56],[0.27,2.68,0.56]].forEach(p=>{bear.add(Object.assign(new THREE.Mesh(new THREE.SphereGeometry(0.06,6,6),new THREE.MeshLambertMaterial({color:0xffffff})),{position:new THREE.Vector3(...p)}))});
+            bear.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(0.25,0.15,0.15),new THREE.MeshLambertMaterial({color:0x222222})),{position:new THREE.Vector3(0,2.45,0.55)}));
             [[-1.05,1.4,0],[1.05,1.4,0]].forEach(p=>{const a=new THREE.Mesh(new THREE.BoxGeometry(0.5,1.0,0.5),new THREE.MeshLambertMaterial({color:bc}));a.position.set(...p);a.castShadow=true;bear.add(a)});
             [[-0.45,0.35,0],[0.45,0.35,0]].forEach(p=>{const l=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.7,0.6),new THREE.MeshLambertMaterial({color:bc}));l.position.set(...p);l.castShadow=true;bear.add(l)});
-            [[-0.45,0.15,0.1],[0.45,0.15,0.1]].forEach(p=>{const pw=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.3,0.8),new THREE.MeshLambertMaterial({color:bc2}));pw.position.set(...p);bear.add(pw)});
-            const tail=new THREE.Mesh(new THREE.SphereGeometry(0.18,6,6),new THREE.MeshLambertMaterial({color:bc}));tail.position.set(0,1.5,-0.7);bear.add(tail);
+            [[-0.45,0.15,0.1],[0.45,0.15,0.1]].forEach(p=>{bear.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(0.5,0.3,0.8),new THREE.MeshLambertMaterial({color:bc2})),{position:new THREE.Vector3(...p)}))});
+            bear.add(Object.assign(new THREE.Mesh(new THREE.SphereGeometry(0.18,6,6),new THREE.MeshLambertMaterial({color:bc})),{position:new THREE.Vector3(0,1.5,-0.7)}));
 
-            // HP 條
-            const hpBg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,0.18),new THREE.MeshBasicMaterial({color:0x333333,side:THREE.DoubleSide}));
-            hpBg.position.y=3.5; bear.add(hpBg);
-            const hpFill=new THREE.Mesh(new THREE.PlaneGeometry(1.58,0.15),new THREE.MeshBasicMaterial({color:0xFF3333,side:THREE.DoubleSide}));
-            hpFill.position.y=3.5; hpFill.position.z=0.01; bear.add(hpFill);
+            // HP 條 billboard
+            const hpBg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,0.2),new THREE.MeshBasicMaterial({color:0x333333,side:THREE.DoubleSide}));
+            hpBg.position.y=3.7;bear.add(hpBg);
+            const hpFill=new THREE.Mesh(new THREE.PlaneGeometry(1.58,0.17),new THREE.MeshBasicMaterial({color:0xFF3333,side:THREE.DoubleSide}));
+            hpFill.position.y=3.7;hpFill.position.z=0.01;bear.add(hpFill);
 
-            const baseHP = 30 + (hpBonus || 0);
-            bear.userData = { isBear:true, hp:baseHP, maxHP:baseHP, hpFill, dying:false, beingHit:false, chasing:false, attackCD:0, hitStartTime:0, hitDuration:500, spawnTime:Date.now(), spawning:true, bobPhase:Math.random()*Math.PI*2 };
+            const baseHP=30+(hpBonus||0);
+            bear.userData={isBear:true,hp:baseHP,maxHP:baseHP,hpFill,hpBg,dying:false,beingHit:false,chasing:false,attackCD:0,hitStartTime:0,hitDuration:500,spawnTime:Date.now(),spawning:true,bobPhase:Math.random()*Math.PI*2};
             return bear;
         }
 
-        function spawnBear() {
-            const levelBonus = Math.floor(upgradeLevel / 2) * 10;
-            const bear = createBear(levelBonus);
-            const half = GROUND_SIZE / 2 - 5;
-            let x, z, tries=0;
-            do { x=(Math.random()-0.5)*half*2; z=(Math.random()-0.5)*half*2; tries++; } while (isTooClose(x,z)&&tries<50);
-            bear.position.set(x,0,z); bear.rotation.y=Math.random()*Math.PI*2;
-            bear.scale.set(0,0,0);
-            scene.add(bear); bears.push(bear);
+        function spawnBear(){
+            const lb=Math.floor(upgradeLevel/2)*10;
+            const bear=createBear(lb);
+            const half=GROUND_SIZE/2-5;
+            let x,z,tries=0;
+            do{x=(Math.random()-0.5)*half*2;z=(Math.random()-0.5)*half*2;tries++}while(isTooClose(x,z)&&tries<50);
+            bear.position.set(x,0,z);bear.rotation.y=Math.random()*Math.PI*2;
+            bear.scale.set(0,0,0);scene.add(bear);bears.push(bear);
         }
-
         function isTooClose(x,z){for(const b of bears){const dx=b.position.x-x,dz=b.position.z-z;if(Math.sqrt(dx*dx+dz*dz)<5)return true}return false}
 
-        // ============ 自動攻擊熊 ============
-        function tryAutoAttack() {
-            if (isAttacking || gameIsOver) return;
-            const now = Date.now();
-            if (now - lastAttackTime < ATTACK_COOLDOWN) return;
-            let closest=null, minDist=ATTACK_RANGE;
-            for(const b of bears){if(b.userData.dying||b.userData.beingHit)continue;const d=player.position.distanceTo(b.position);if(d<minDist){minDist=d;closest=b}}
-            if(!closest) return;
-            isAttacking=true; lastAttackTime=now;
-            player.userData.attacking=true; player.userData.attackTarget=closest;
-            player.userData.attackStartTime=now; player.userData.attackDuration=600;
-            const dir=new THREE.Vector3().subVectors(closest.position,player.position); dir.y=0;
+        // ============ 範圍自動攻擊（AOE）============
+        function tryAutoAttack(){
+            if(isAttacking||gameIsOver)return;
+            const now=Date.now();
+            if(now-lastAttackTime<ATTACK_COOLDOWN)return;
+            // 找範圍內所有熊
+            let targets=[];
+            for(const b of bears){if(b.userData.dying||b.userData.beingHit)continue;const d=player.position.distanceTo(b.position);if(d<ATTACK_RANGE)targets.push({bear:b,dist:d})}
+            if(targets.length===0)return;
+            targets.sort((a,b)=>a.dist-b.dist);
+
+            isAttacking=true;lastAttackTime=now;
+            player.userData.attacking=true;
+            player.userData.attackTargets=targets.map(t=>t.bear);
+            player.userData.attackStartTime=now;
+            player.userData.attackDuration=600;
+
+            // 朝最近的熊
+            const nearest=targets[0].bear;
+            const dir=new THREE.Vector3().subVectors(nearest.position,player.position);dir.y=0;
             player.rotation.y=Math.atan2(dir.x,dir.z);
         }
 
-        function onAttackHit(bear) {
-            if(bear.userData.dying||bear.userData.beingHit) return;
-            bear.userData.hp -= playerATK;
-            showDamageNumber(bear.position, playerATK);
-            createHitEffect(bear.position.clone().add(new THREE.Vector3(0,1.5,0)));
-
-            // 更新熊 HP 條
-            const ratio = Math.max(0, bear.userData.hp / bear.userData.maxHP);
-            bear.userData.hpFill.scale.x = ratio;
-            bear.userData.hpFill.position.x = -(1-ratio)*0.79;
-
-            if (bear.userData.hp <= 0) {
-                bear.userData.beingHit = true;
-                bear.userData.hitStartTime = Date.now();
-                bear.userData.hitDuration = 500;
-                killScore++;
-                document.getElementById('killCount').textContent = killScore;
+        function onAttackHit(targets){
+            if(!targets)return;
+            for(const bear of targets){
+                if(bear.userData.dying||bear.userData.beingHit)continue;
+                bear.userData.hp-=playerATK;
+                showDamageNumber(bear.position,playerATK);
+                createHitEffect(bear.position.clone().add(new THREE.Vector3(0,1.5,0)));
+                const ratio=Math.max(0,bear.userData.hp/bear.userData.maxHP);
+                bear.userData.hpFill.scale.x=ratio;
+                bear.userData.hpFill.position.x=-(1-ratio)*0.79;
+                if(bear.userData.hp<=0){
+                    bear.userData.beingHit=true;bear.userData.hitStartTime=Date.now();bear.userData.hitDuration=500;
+                    killScore++;document.getElementById('killCount').textContent=killScore;
+                }
             }
         }
 
         // ============ 熊攻擊玩家 ============
-        function bearsAttackPlayer(dt) {
-            if (gameIsOver) return;
-            const now = Date.now();
-            for (const bear of bears) {
-                if (bear.userData.dying || bear.userData.beingHit) continue;
-                const dist = player.position.distanceTo(bear.position);
-
-                // 偵測範圍 6 → 追蹤
-                if (dist < 6) {
-                    bear.userData.chasing = true;
-                }
-                if (dist > 10) {
-                    bear.userData.chasing = false;
-                }
-
-                if (bear.userData.chasing) {
-                    // 朝玩家移動
-                    const dir = new THREE.Vector3().subVectors(player.position, bear.position);
-                    dir.y = 0; dir.normalize();
-                    const speed = 5;
-                    bear.position.x += dir.x * speed * dt;
-                    bear.position.z += dir.z * speed * dt;
-                    bear.rotation.y = Math.atan2(dir.x, dir.z);
-
-                    // 邊界
-                    const lim = GROUND_SIZE/2-3;
-                    bear.position.x = Math.max(-lim, Math.min(lim, bear.position.x));
-                    bear.position.z = Math.max(-lim, Math.min(lim, bear.position.z));
-
-                    // 攻擊玩家
-                    if (dist < 1.8 && now > bear.userData.attackCD) {
-                        bear.userData.attackCD = now + 1200;
-                        const dmg = 8 + Math.floor(Math.random() * 5);
-                        playerHP -= dmg;
-                        showDamageNumber(player.position, dmg, true);
-                        player.userData.parts.hpFill.scale.x = Math.max(0, playerHP / playerMaxHP);
-
-                        if (playerHP <= 0) {
-                            playerHP = 0;
-                            gameOver();
-                        }
+        function bearsAttackPlayer(dt){
+            if(gameIsOver)return;const now=Date.now();
+            for(const bear of bears){
+                if(bear.userData.dying||bear.userData.beingHit)continue;
+                const dist=player.position.distanceTo(bear.position);
+                if(dist<6)bear.userData.chasing=true;
+                if(dist>10)bear.userData.chasing=false;
+                if(bear.userData.chasing){
+                    const dir=new THREE.Vector3().subVectors(player.position,bear.position);dir.y=0;dir.normalize();
+                    bear.position.x+=dir.x*5*dt;bear.position.z+=dir.z*5*dt;
+                    bear.rotation.y=Math.atan2(dir.x,dir.z);
+                    const lim=GROUND_SIZE/2-3;
+                    bear.position.x=Math.max(-lim,Math.min(lim,bear.position.x));
+                    bear.position.z=Math.max(-lim,Math.min(lim,bear.position.z));
+                    if(dist<1.8&&now>bear.userData.attackCD){
+                        bear.userData.attackCD=now+1200;
+                        const dmg=8+Math.floor(Math.random()*5);
+                        playerHP-=dmg;showDamageNumber(player.position,dmg,true);
+                        player.userData.parts.hpFill.scale.x=Math.max(0,playerHP/playerMaxHP);
+                        if(playerHP<=0){playerHP=0;gameOver()}
                     }
                 }
             }
         }
 
-        // ============ 數字顯示 ============
-        function showDamageNumber(worldPos, dmg, isPlayerHit) {
-            const pos = worldPos.clone(); pos.y = isPlayerHit ? 3.5 : 3;
+        function showDamageNumber(worldPos,dmg,isPlayerHit){
+            const pos=worldPos.clone();pos.y=isPlayerHit?3.5:3.5;
             pos.project(camera);
-            const sx=(pos.x*0.5+0.5)*window.innerWidth;
-            const sy=(-pos.y*0.5+0.5)*window.innerHeight;
-            const el=document.createElement('div');
-            el.className='hitMarker';
-            el.textContent=`-${dmg}`;
-            el.style.left=sx+'px'; el.style.top=sy+'px';
+            const sx=(pos.x*0.5+0.5)*innerWidth;
+            const sy=(-pos.y*0.5+0.5)*innerHeight;
+            const el=document.createElement('div');el.className='hitMarker';
+            el.textContent='-'+dmg;el.style.left=sx+'px';el.style.top=sy+'px';
             el.style.color=isPlayerHit?'#FF4444':'#FFD700';
-            document.body.appendChild(el);
-            setTimeout(()=>el.remove(),800);
+            document.body.appendChild(el);setTimeout(()=>el.remove(),800);
         }
 
-        // ============ 特效 ============
         function createHitEffect(position){
             const flash=new THREE.Mesh(new THREE.SphereGeometry(0.8,8,8),new THREE.MeshBasicMaterial({color:0xFFFF00,transparent:true,opacity:0.8}));
             flash.position.copy(position);scene.add(flash);
@@ -404,149 +411,98 @@
             (function a(){const t=(Date.now()-st)/500;if(t>=1){scene.remove(flash);ps.forEach(p=>scene.remove(p));return}flash.scale.set(1+t*2,1+t*2,1+t*2);flash.material.opacity=0.8*(1-t);ps.forEach(p=>{p.position.add(p.userData.vel.clone().multiplyScalar(0.016));p.userData.vel.y-=9.8*0.016;p.material.opacity=1-t;p.scale.setScalar(1-t*0.5)});requestAnimationFrame(a)})();
         }
 
-        // ============ 擊殺熊 ============
         function killBear(bear){
-            bear.userData.dying=true;
-            bear.userData.deathStartTime=Date.now();
+            bear.userData.dying=true;bear.userData.deathStartTime=Date.now();
             bear.userData.deathPos=bear.position.clone();
             createMeatDrop(bear.position.clone());
             const idx=bears.indexOf(bear);if(idx>-1)bears.splice(idx,1);
-            setTimeout(spawnBear, SPAWN_DELAY*1000);
+            setTimeout(spawnBear,SPAWN_DELAY*1000);
         }
 
-        // ============ 掉落物 ============
         function createMeatDrop(position){
             const mg=new THREE.Group();
-            const m1=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5),new THREE.MeshLambertMaterial({color:0xCC2222}));m1.castShadow=true;mg.add(m1);
+            mg.add(new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5),new THREE.MeshLambertMaterial({color:0xCC2222})));
             const m2=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.35,0.35),new THREE.MeshLambertMaterial({color:0xEE3333}));m2.position.set(0.25,0.25,0);mg.add(m2);
             const bone=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.4,6),new THREE.MeshLambertMaterial({color:0xFFFFF0}));bone.rotation.z=Math.PI/2;bone.position.set(-0.1,0.35,0);mg.add(bone);
             mg.position.copy(position);mg.position.y=0.5;mg.scale.set(0,0,0);scene.add(mg);
             const md={mesh:mg,spawnTime:Date.now(),collected:false,startPos:mg.position.clone(),flyStart:null};
-            meatDrops.push(md);
-            setTimeout(()=>{if(!md.collected){md.flyStart=Date.now();md.collected=true}},400);
+            meatDrops.push(md);setTimeout(()=>{if(!md.collected){md.flyStart=Date.now();md.collected=true}},400);
         }
 
         // ============ 升級系統 ============
-        window.toggleUpgradePanel = function() {
-            const panel = document.getElementById('upgradePanel');
-            if (panel.style.display === 'block') { closeUpgradePanel(); return; }
-            panel.style.display = 'block';
-            document.getElementById('upgLevel').textContent = upgradeLevel;
-            document.getElementById('upgAtk').textContent = playerATK;
-            document.getElementById('upgMeat').textContent = totalMeat;
-            document.getElementById('upgCost').textContent = upgradeCost;
-            const btn = document.getElementById('upgradeBtn');
-            btn.textContent = `升級 (${upgradeCost} 🥩)`;
-            btn.disabled = totalMeat < upgradeCost;
+        window.toggleUpgradePanel=function(){
+            const p=document.getElementById('upgradePanel');
+            if(p.style.display==='block'){closeUpgradePanel();return}
+            p.style.display='block';
+            document.getElementById('upgLevel').textContent=upgradeLevel;
+            document.getElementById('upgAtk').textContent=playerATK;
+            document.getElementById('upgMeat').textContent=totalMeat;
+            document.getElementById('upgCost').textContent=upgradeCost;
+            const btn=document.getElementById('upgradeBtn');
+            btn.textContent='升級 ('+upgradeCost+' 🥩)';btn.disabled=totalMeat<upgradeCost;
         };
-
-        window.closeUpgradePanel = function() { document.getElementById('upgradePanel').style.display = 'none'; };
-
-        window.doUpgrade = function() {
-            if (totalMeat < upgradeCost) return;
-            totalMeat -= upgradeCost;
-            upgradeLevel++;
-            playerATK += 5;
-            ATTACK_RANGE = 1.5 + upgradeLevel * 0.3;
-            playerMaxHP += 10;
-            playerHP = Math.min(playerHP + 20, playerMaxHP);
-            upgradeCost = Math.floor(upgradeCost * 1.8);
-
-            document.getElementById('meatCount').textContent = totalMeat;
-            player.userData.parts.hpFill.scale.x = playerHP / playerMaxHP;
-
-            // 升級動畫
-            const fx = document.createElement('div');
-            fx.className = 'upgradeFx';
-            fx.textContent = `⬆️ Lv.${upgradeLevel}! ATK:${playerATK}`;
-            document.body.appendChild(fx);
-            setTimeout(() => fx.remove(), 1500);
-
-            // 武器變大
-            const axe = player.userData.parts.axeGroup;
-            const s = 1 + upgradeLevel * 0.1;
-            axe.scale.set(s, s, s);
-
+        window.closeUpgradePanel=function(){document.getElementById('upgradePanel').style.display='none'};
+        window.doUpgrade=function(){
+            if(totalMeat<upgradeCost)return;
+            totalMeat-=upgradeCost;upgradeLevel++;playerATK+=10;
+            ATTACK_RANGE=2+upgradeLevel*0.3;
+            playerMaxHP+=15;playerHP=Math.min(playerHP+25,playerMaxHP);
+            upgradeCost=Math.floor(upgradeCost*1.8);
+            document.getElementById('meatCount').textContent=totalMeat;
+            player.userData.parts.hpFill.scale.x=playerHP/playerMaxHP;
+            updateCostLabel();
+            const fx=document.createElement('div');fx.className='upgradeFx';
+            fx.textContent='⬆️ Lv.'+upgradeLevel+'! ATK:'+playerATK;
+            document.body.appendChild(fx);setTimeout(()=>fx.remove(),1500);
+            const s=1+upgradeLevel*0.1;player.userData.parts.axeGroup.scale.set(s,s,s);
             toggleUpgradePanel();
         };
 
-        // ============ 遊戲結束 ============
-        function gameOver() {
-            gameIsOver = true;
-            document.getElementById('finalScore').textContent = totalMeat + ' 🥩';
-            document.getElementById('gameOver').style.display = 'block';
-        }
-
-        window.restartGame = function() {
-            // 重置
-            gameIsOver = false; playerHP = 100; playerMaxHP = 100; playerATK = 10;
-            upgradeLevel = 1; upgradeCost = 5; totalMeat = 0; ATTACK_RANGE = 1.5;
-            player.position.set(0, 0, 5); player.rotation.y = 0;
-            player.userData.parts.hpFill.scale.x = 1;
+        function gameOver(){gameIsOver=true;document.getElementById('finalScore').textContent=totalMeat+' 🥩';document.getElementById('gameOver').style.display='block'}
+        window.restartGame=function(){
+            gameIsOver=false;playerHP=100;playerMaxHP=100;playerATK=15;
+            upgradeLevel=1;upgradeCost=5;totalMeat=0;ATTACK_RANGE=2;
+            player.position.set(0,0,5);player.rotation.y=0;
+            player.userData.parts.hpFill.scale.x=1;
             player.userData.parts.axeGroup.scale.set(1,1,1);
-            killScore = 0;
-
-            // 清除所有熊
-            for (const b of [...bears]) { scene.remove(b); }
-            bears.length = 0;
-            for (const m of meatDrops) { scene.remove(m.mesh); }
-            meatDrops.length = 0;
-
-            document.getElementById('killCount').textContent = 0;
-            document.getElementById('meatCount').textContent = 0;
-            document.getElementById('gameOver').style.display = 'none';
-
-            for (let i = 0; i < 5; i++) spawnBear();
+            killScore=0;
+            for(const b of[...bears])scene.remove(b);bears.length=0;
+            for(const m of meatDrops)scene.remove(m.mesh);meatDrops.length=0;
+            document.getElementById('killCount').textContent=0;
+            document.getElementById('meatCount').textContent=0;
+            document.getElementById('gameOver').style.display='none';
+            updateCostLabel();
+            for(let i=0;i<8;i++)spawnBear();
         };
 
-        // ============ 觸控控制 ============
-        function setupTouchControls() {
-            const joystickArea=document.getElementById('joystickArea');
-            const joystickThumb=document.getElementById('joystickThumb');
-            const attackBtn=document.getElementById('attackBtn');
-            const JOYSTICK_RADIUS=40;
-            let joystickCenter={x:0,y:0};
-
-            document.addEventListener('touchstart',(e)=>{
-                for(let i=0;i<e.changedTouches.length;i++){
-                    const touch=e.changedTouches[i];
-                    const el=document.elementFromPoint(touch.clientX,touch.clientY);
-                    if(el&&(el===joystickArea||joystickArea.contains(el))){e.preventDefault();joystickTouchId=touch.identifier;isJoystickActive=true;const r=joystickArea.getBoundingClientRect();joystickCenter={x:r.left+r.width/2,y:r.top+r.height/2};updateJoystick(touch.clientX,touch.clientY);continue}
-                    if(el&&(el===attackBtn||attackBtn.contains(el))){e.preventDefault();tryAutoAttack();continue}
-                    if(touch.clientX>window.innerWidth/2&&cameraTouchId===null){cameraTouchId=touch.identifier;lastCameraTouchX=touch.clientX;lastCameraTouchY=touch.clientY}
-                }
-            },{passive:false});
-
-            document.addEventListener('touchmove',(e)=>{
-                for(let i=0;i<e.touches.length;i++){
-                    if(e.touches[i].identifier===joystickTouchId){e.preventDefault();updateJoystick(e.touches[i].clientX,e.touches[i].clientY)}
-                    if(e.touches[i].identifier===cameraTouchId){e.preventDefault();cameraAngle-=(e.touches[i].clientX-lastCameraTouchX)*0.005;cameraPitch=Math.max(0.3,Math.min(1.2,cameraPitch+(e.touches[i].clientY-lastCameraTouchY)*0.005));lastCameraTouchX=e.touches[i].clientX;lastCameraTouchY=e.touches[i].clientY}
-                }
-            },{passive:false});
-
-            document.addEventListener('touchend',(e)=>{for(let i=0;i<e.changedTouches.length;i++){if(e.changedTouches[i].identifier===joystickTouchId){joystickTouchId=null;isJoystickActive=false;joystickInput.x=0;joystickInput.y=0;joystickThumb.style.transform='translate(-50%,-50%)'}if(e.changedTouches[i].identifier===cameraTouchId)cameraTouchId=null}},{passive:false});
-            document.addEventListener('touchcancel',(e)=>{for(let i=0;i<e.changedTouches.length;i++){if(e.changedTouches[i].identifier===joystickTouchId){joystickTouchId=null;isJoystickActive=false;joystickInput.x=0;joystickInput.y=0;joystickThumb.style.transform='translate(-50%,-50%)'}if(e.changedTouches[i].identifier===cameraTouchId)cameraTouchId=null}},{passive:false});
-
-            function updateJoystick(tx,ty){let dx=tx-joystickCenter.x,dy=ty-joystickCenter.y,d=Math.sqrt(dx*dx+dy*dy);if(d>JOYSTICK_RADIUS){dx=dx/d*JOYSTICK_RADIUS;dy=dy/d*JOYSTICK_RADIUS}joystickThumb.style.transform=`translate(calc(-50%+${dx}px),calc(-50%+${dy}px))`;joystickInput.x=dx/JOYSTICK_RADIUS;joystickInput.y=dy/JOYSTICK_RADIUS}
+        // ============ 觸控 ============
+        function setupTouchControls(){
+            const ja=document.getElementById('joystickArea'),jt=document.getElementById('joystickThumb'),ab=document.getElementById('attackBtn');
+            const JR=40;let jc={x:0,y:0};
+            document.addEventListener('touchstart',e=>{for(let i=0;i<e.changedTouches.length;i++){const t=e.changedTouches[i],el=document.elementFromPoint(t.clientX,t.clientY);
+                if(el&&(el===ja||ja.contains(el))){e.preventDefault();joystickTouchId=t.identifier;isJoystickActive=true;const r=ja.getBoundingClientRect();jc={x:r.left+r.width/2,y:r.top+r.height/2};uJ(t.clientX,t.clientY);continue}
+                if(el&&(el===ab||ab.contains(el))){e.preventDefault();tryAutoAttack();continue}
+                if(t.clientX>innerWidth/2&&cameraTouchId===null){cameraTouchId=t.identifier;lastCameraTouchX=t.clientX;lastCameraTouchY=t.clientY}}},{passive:false});
+            document.addEventListener('touchmove',e=>{for(let i=0;i<e.touches.length;i++){if(e.touches[i].identifier===joystickTouchId){e.preventDefault();uJ(e.touches[i].clientX,e.touches[i].clientY)}if(e.touches[i].identifier===cameraTouchId){e.preventDefault();cameraAngle-=(e.touches[i].clientX-lastCameraTouchX)*0.005;cameraPitch=Math.max(0.3,Math.min(1.2,cameraPitch+(e.touches[i].clientY-lastCameraTouchY)*0.005));lastCameraTouchX=e.touches[i].clientX;lastCameraTouchY=e.touches[i].clientY}}},{passive:false});
+            document.addEventListener('touchend',e=>{for(let i=0;i<e.changedTouches.length;i++){if(e.changedTouches[i].identifier===joystickTouchId){joystickTouchId=null;isJoystickActive=false;joystickInput.x=0;joystickInput.y=0;jt.style.transform='translate(-50%,-50%)'}if(e.changedTouches[i].identifier===cameraTouchId)cameraTouchId=null}},{passive:false});
+            document.addEventListener('touchcancel',e=>{for(let i=0;i<e.changedTouches.length;i++){if(e.changedTouches[i].identifier===joystickTouchId){joystickTouchId=null;isJoystickActive=false;joystickInput.x=0;joystickInput.y=0;jt.style.transform='translate(-50%,-50%)'}if(e.changedTouches[i].identifier===cameraTouchId)cameraTouchId=null}},{passive:false});
+            function uJ(tx,ty){let dx=tx-jc.x,dy=ty-jc.y,d=Math.sqrt(dx*dx+dy*dy);if(d>JR){dx=dx/d*JR;dy=dy/d*JR}jt.style.transform='translate(calc(-50%+'+dx+'px),calc(-50%+'+dy+'px))';joystickInput.x=dx/JR;joystickInput.y=dy/JR}
         }
 
         // ============ 玩家移動 ============
-        function updatePlayer(dt) {
-            if (gameIsOver) return;
-            const now=Date.now(), moveDir=new THREE.Vector3();
+        function updatePlayer(dt){
+            if(gameIsOver)return;const now=Date.now(),md=new THREE.Vector3();
             const canMove=!isAttacking;
             if(canMove){
-                if(keys['w']||keys['arrowup'])moveDir.z-=1;
-                if(keys['s']||keys['arrowdown'])moveDir.z+=1;
-                if(keys['a']||keys['arrowleft'])moveDir.x-=1;
-                if(keys['d']||keys['arrowright'])moveDir.x+=1;
-                if(isJoystickActive&&(Math.abs(joystickInput.x)>0.1||Math.abs(joystickInput.y)>0.1)){moveDir.x+=joystickInput.x;moveDir.z+=joystickInput.y}
+                if(keys['w']||keys['arrowup'])md.z-=1;if(keys['s']||keys['arrowdown'])md.z+=1;
+                if(keys['a']||keys['arrowleft'])md.x-=1;if(keys['d']||keys['arrowright'])md.x+=1;
+                if(isJoystickActive&&(Math.abs(joystickInput.x)>0.1||Math.abs(joystickInput.y)>0.1)){md.x+=joystickInput.x;md.z+=joystickInput.y}
             }
-            if(moveDir.length()>0){
-                moveDir.normalize();
-                const camDir=new THREE.Vector3();camera.getWorldDirection(camDir);camDir.y=0;camDir.normalize();
-                const camRight=new THREE.Vector3().crossVectors(camDir,new THREE.Vector3(0,1,0)).normalize();
-                const wm=new THREE.Vector3();wm.addScaledVector(camRight,moveDir.x);wm.addScaledVector(camDir,-moveDir.z);wm.normalize();
+            if(md.length()>0){
+                md.normalize();
+                const cd=new THREE.Vector3();camera.getWorldDirection(cd);cd.y=0;cd.normalize();
+                const cr=new THREE.Vector3().crossVectors(cd,new THREE.Vector3(0,1,0)).normalize();
+                const wm=new THREE.Vector3();wm.addScaledVector(cr,md.x);wm.addScaledVector(cd,-md.z);wm.normalize();
                 player.position.x+=wm.x*PLAYER_SPEED*dt;player.position.z+=wm.z*PLAYER_SPEED*dt;
                 const lim=GROUND_SIZE/2-2;player.position.x=Math.max(-lim,Math.min(lim,player.position.x));player.position.z=Math.max(-lim,Math.min(lim,player.position.z));
                 if(!isAttacking){const ta=Math.atan2(wm.x,wm.z);let c=player.rotation.y,d=ta-c;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;player.rotation.y+=d*0.15}
@@ -560,45 +516,35 @@
                 if(!isAttacking){const ps=player.userData.parts;if(ps){ps.legL.position.z*=0.85;ps.legR.position.z*=0.85;ps.armL.rotation.x*=0.85;ps.armR.rotation.x*=0.85}player.position.y*=0.9}
             }
 
-            // 攻擊動畫
             if(isAttacking){
                 const ae=now-player.userData.attackStartTime,ad=player.userData.attackDuration,ap=Math.min(ae/ad,1);
                 const ps=player.userData.parts;
                 if(ap<0.3){const t=ap/0.3;ps.axeGroup.rotation.z=-t*0.8;ps.armR.rotation.x=-t*0.6}
-                else if(ap<0.6){const t=(ap-0.3)/0.3;ps.axeGroup.rotation.z=-0.8+t*2.0;ps.armR.rotation.x=-0.6+t*1.2;if(t>0.3&&!player.userData.hitDealt&&player.userData.attackTarget){player.userData.hitDealt=true;onAttackHit(player.userData.attackTarget)}}
+                else if(ap<0.6){const t=(ap-0.3)/0.3;ps.axeGroup.rotation.z=-0.8+t*2.0;ps.armR.rotation.x=-0.6+t*1.2;if(t>0.3&&!player.userData.hitDealt){player.userData.hitDealt=true;onAttackHit(player.userData.attackTargets)}}
                 else{const t=(ap-0.6)/0.4;ps.axeGroup.rotation.z=1.2*(1-t);ps.armR.rotation.x=0.6*(1-t)}
-                if(ap>=1){isAttacking=false;player.userData.attacking=false;player.userData.hitDealt=false;player.userData.attackTarget=null;ps.axeGroup.rotation.z=0;ps.armR.rotation.x=0}
+                if(ap>=1){isAttacking=false;player.userData.attacking=false;player.userData.hitDealt=false;player.userData.attackTargets=null;ps.axeGroup.rotation.z=0;ps.armR.rotation.x=0}
             }
-
             tryAutoAttack();
 
-            // 檢查是否靠近升級台
-            const distToStation = player.position.distanceTo(new THREE.Vector3(0,0,0));
-            nearUpgradeStation = distToStation < 4;
-            document.getElementById('controls').innerHTML = nearUpgradeStation ?
-                '<span>WASD</span> 移動 ｜ <span>E</span> 開啟升級 ｜ 靠近熊自動攻擊' :
-                '<span>WASD</span> 移動 ｜ 靠近基地按 <span>E</span> 升級 ｜ 靠近熊自動攻擊';
+            nearUpgradeStation=player.position.distanceTo(new THREE.Vector3(0,0,0))<4.5;
+            document.getElementById('controls').innerHTML=nearUpgradeStation?
+                '<span>WASD</span> 移動 ｜ <span>E</span> 開啟升級 ｜ 靠近熊自動範圍攻擊':
+                '<span>WASD</span> 移動 ｜ 靠近基地按 <span>E</span> 升級 ｜ 靠近熊自動範圍攻擊';
 
-            // 攝影機
             const ox=Math.sin(cameraAngle)*CAMERA_DISTANCE*Math.cos(cameraPitch);
             const oz=Math.cos(cameraAngle)*CAMERA_DISTANCE*Math.cos(cameraPitch);
             const oy=CAMERA_HEIGHT*Math.sin(cameraPitch)+5;
-            const cp=new THREE.Vector3(player.position.x+ox,player.position.y+oy,player.position.z+oz);
-            camera.position.lerp(cp,0.1);
+            camera.position.lerp(new THREE.Vector3(player.position.x+ox,player.position.y+oy,player.position.z+oz),0.1);
             camera.lookAt(player.position.x,player.position.y+1.5,player.position.z);
 
-            // UI
-            document.getElementById('playerHPText').textContent=`HP: ${Math.max(0,playerHP)}/${playerMaxHP}  ATK: ${playerATK}`;
-            document.getElementById('playerHPFill').style.width=`${Math.max(0,playerHP/playerMaxHP*100)}%`;
-            if(playerHP<=50)document.getElementById('playerHPFill').style.background='linear-gradient(90deg,#FF6644,#FF4444)';
-            else document.getElementById('playerHPFill').style.background='linear-gradient(90deg,#44FF44,#66FF66)';
+            document.getElementById('playerHPText').textContent='HP: '+Math.max(0,playerHP)+'/'+playerMaxHP+'  ATK: '+playerATK;
+            document.getElementById('playerHPFill').style.width=Math.max(0,playerHP/playerMaxHP*100)+'%';
+            document.getElementById('playerHPFill').style.background=playerHP<=50?'linear-gradient(90deg,#FF6644,#FF4444)':'linear-gradient(90deg,#44FF44,#66FF66)';
 
             const cd=document.getElementById('cooldownBar');if(now-lastAttackTime<ATTACK_COOLDOWN){cd.classList.add('active');document.getElementById('cooldownFill').style.width=((1-(now-lastAttackTime)/ATTACK_COOLDOWN)*100)+'%'}else cd.classList.remove('active');
 
-            const ai=document.getElementById('attackInfo');
-            let nearBear=false;
-            for(const b of bears){if(!b.userData.dying&&!b.userData.beingHit&&player.position.distanceTo(b.position)<ATTACK_RANGE){nearBear=true;break}}
-            ai.textContent=nearBear?'⚔️ 接近獵物中...':'';
+            let nb=false;for(const b of bears){if(!b.userData.dying&&!b.userData.beingHit&&player.position.distanceTo(b.position)<ATTACK_RANGE){nb=true;break}}
+            document.getElementById('attackInfo').textContent=nb?'⚔️ 範圍攻擊中...':'';
         }
 
         // ============ 主動畫循環 ============
@@ -606,48 +552,46 @@
         function animate(){
             requestAnimationFrame(animate);
             const now=Date.now(),dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;
-            updatePlayer(dt);
-            bearsAttackPlayer(dt);
+            updatePlayer(dt);bearsAttackPlayer(dt);
 
-            // 升級台動畫
             if(upgradeStation){
-                const ring=upgradeStation.userData.ring;
-                const glow=upgradeStation.userData.glow;
+                const ring=upgradeStation.userData.ring,glow=upgradeStation.userData.glow;
                 ring.material.opacity=0.2+Math.sin(now*0.003)*0.15;
                 glow.material.opacity=0.1+Math.sin(now*0.002)*0.08;
-                if(nearUpgradeStation){ring.material.opacity=0.5+Math.sin(now*0.008)*0.3}
+                if(nearUpgradeStation)ring.material.opacity=0.5+Math.sin(now*0.008)*0.3;
             }
 
-            // 熊動畫
             for(let i=bears.length-1;i>=0;i--){
                 const bear=bears[i];
                 if(bear.userData.spawning){const t=(now-bear.userData.spawnTime)/500;if(t>=1){bear.scale.set(1,1,1);bear.userData.spawning=false}else{const s=easeOutBack(t);bear.scale.set(s,s,s)}}
                 if(bear.userData.beingHit&&!bear.userData.dying){const t=(now-bear.userData.hitStartTime)/bear.userData.hitDuration;if(t>=1){killBear(bear);continue}const e=easeInQuad(t);bear.rotation.x=e*(Math.PI/2);bear.position.y=-e*0.5;const s=1-e*0.3;bear.scale.set(s,s,s);bear.traverse(ch=>{if(ch.isMesh&&ch.material&&!ch.userData.colorSet){ch.userData.originalColor=ch.material.color.clone();ch.userData.colorSet=true}if(ch.isMesh&&ch.userData.originalColor)ch.material.color.lerp(new THREE.Color(0xFF2222),e*0.6)});continue}
                 if(bear.userData.dying){const t=(now-bear.userData.deathStartTime)/400;if(t>=1)scene.remove(bear);else{const s=1-t;bear.scale.set(s,s,s);bear.position.y=bear.userData.deathPos.y+t*2;bear.rotation.y+=0.15}continue}
                 if(!bear.userData.chasing){bear.userData.bobPhase+=0.02;bear.position.y=Math.sin(bear.userData.bobPhase)*0.05}
-                // HP 條面向攝影機
-                bear.children.forEach(ch=>{if(ch.geometry&&ch.geometry.parameters&&ch.geometry.parameters.width>1.4){ch.lookAt(camera.position)}});
+                // Billboard HP 條永遠面對鏡頭
+                if(bear.userData.hpBg){bear.userData.hpBg.quaternion.copy(camera.quaternion);bear.userData.hpFill.quaternion.copy(camera.quaternion)}
             }
 
-            // 掉落物
+            // 玩家 HP 條 billboard
+            if(player.userData.parts.hpBg){
+                player.userData.parts.hpBg.quaternion.copy(camera.quaternion);
+                player.userData.parts.hpFill.quaternion.copy(camera.quaternion);
+            }
+
             for(let i=meatDrops.length-1;i>=0;i--){
                 const meat=meatDrops[i];
                 if(!meat.collected){const t=(now-meat.spawnTime)/300;if(t>=1)meat.mesh.scale.set(1,1,1);else{const s=easeOutBack(t);meat.mesh.scale.set(s,s,s)}meat.mesh.position.y=0.5+Math.sin(now*0.005)*0.15;meat.mesh.rotation.y+=0.03}
-                if(meat.collected&&meat.flyStart){const el=(now-meat.flyStart)/(FLY_DURATION*1000);if(el>=1){scene.remove(meat.mesh);meatDrops.splice(i,1);totalMeat++;document.getElementById('meatCount').textContent=totalMeat;const bp=document.getElementById('backpack');bp.style.transform='scale(1.3)';setTimeout(()=>{bp.style.transform='scale(1)'},150)}else{const p=easeInOutCubic(el);const ep=new THREE.Vector3(player.position.x,10,player.position.z);const mp=meat.startPos.clone();mp.y+=5;const t1=meat.startPos.clone().lerp(mp,p);const t2=mp.clone().lerp(ep,p);meat.mesh.position.copy(t1.lerp(t2,p));meat.mesh.rotation.x+=0.1;meat.mesh.rotation.z+=0.08;const s=1-p*0.5;meat.mesh.scale.set(s,s,s);meat.mesh.traverse(c=>{if(c.isMesh&&c.material){c.material.transparent=true;c.material.opacity=1-p*0.5}})}}
+                if(meat.collected&&meat.flyStart){const el=(now-meat.flyStart)/(FLY_DURATION*1000);if(el>=1){scene.remove(meat.mesh);meatDrops.splice(i,1);totalMeat++;document.getElementById('meatCount').textContent=totalMeat;const bp=document.getElementById('backpack');bp.style.transform='scale(1.3)';setTimeout(()=>bp.style.transform='scale(1)',150)}else{const p=easeInOutCubic(el);const ep=new THREE.Vector3(player.position.x,10,player.position.z);const mp=meat.startPos.clone();mp.y+=5;const t1=meat.startPos.clone().lerp(mp,p);const t2=mp.clone().lerp(ep,p);meat.mesh.position.copy(t1.lerp(t2,p));meat.mesh.rotation.x+=0.1;meat.mesh.rotation.z+=0.08;const s=1-p*0.5;meat.mesh.scale.set(s,s,s);meat.mesh.traverse(c=>{if(c.isMesh&&c.material){c.material.transparent=true;c.material.opacity=1-p*0.5}})}}
             }
-
             renderer.render(scene,camera);
         }
 
-        function onResize(){camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight)}
+        function onResize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
         function easeOutBack(t){const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)}
         function easeInOutCubic(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
         function easeInQuad(t){return t*t}
-
         document.addEventListener('gesturestart',e=>e.preventDefault());
         document.addEventListener('gesturechange',e=>e.preventDefault());
         document.addEventListener('gestureend',e=>e.preventDefault());
-
         init();
     </script>
 </body>
