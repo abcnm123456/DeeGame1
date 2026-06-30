@@ -234,10 +234,10 @@
         let player;
         let keys = {};
         let lockedBear = null;
-        const GROUND_SIZE = 80;
+        const GROUND_SIZE = 40;
         const PLAYER_SPEED = 12;
-        const CAMERA_HEIGHT = 18;
-        const CAMERA_DISTANCE = 22;
+        const CAMERA_HEIGHT = 12;
+        const CAMERA_DISTANCE = 15;
         const SPAWN_DELAY = 0.5;
         const FLY_DURATION = 1.0;
         const ATTACK_RANGE = 6;
@@ -548,10 +548,10 @@
         // ============ 創建樹木 ============
         function createTrees() {
             const positions = [
-                [-28, 0, -25], [-30, 0, 10], [28, 0, -18], [25, 0, 28],
-                [-18, 0, 30], [30, 0, 5], [-30, 0, -8], [12, 0, -30],
-                [-10, 0, 32], [32, 0, -5], [-32, 0, 20], [0, 0, -32],
-                [15, 0, 30], [-25, 0, -28]
+                [-14, 0, -12], [-15, 0, 5], [14, 0, -9], [12, 0, 14],
+                [-9, 0, 15], [15, 0, 3], [-15, 0, -4], [6, 0, -15],
+                [-5, 0, 16], [16, 0, -3], [-16, 0, 10], [0, 0, -16],
+                [7, 0, 15], [-12, 0, -14]
             ];
             positions.forEach(([x, y, z]) => {
                 const t = new THREE.Group();
@@ -569,7 +569,7 @@
         // ============ 創建石頭 ============
         function createRocks() {
             for (let i = 0; i < 15; i++) {
-                const a = Math.random() * Math.PI * 2, d = 10 + Math.random() * 25;
+                const a = Math.random() * Math.PI * 2, d = 5 + Math.random() * 12;
                 const r = new THREE.Mesh(
                     new THREE.DodecahedronGeometry(0.3 + Math.random() * 0.5, 0),
                     new THREE.MeshLambertMaterial({ color: new THREE.Color(0.4 + Math.random() * 0.2, 0.4 + Math.random() * 0.2, 0.38 + Math.random() * 0.15) })
@@ -589,7 +589,7 @@
                 stem.position.y = 0.2; flower.add(stem);
                 const petal = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 6), new THREE.MeshLambertMaterial({ color: colors[Math.floor(Math.random() * colors.length)] }));
                 petal.position.y = 0.45; petal.scale.y = 0.6; flower.add(petal);
-                const a = Math.random() * Math.PI * 2, d = 5 + Math.random() * 30;
+                const a = Math.random() * Math.PI * 2, d = 3 + Math.random() * 14;
                 flower.position.set(Math.cos(a) * d, 0, Math.sin(a) * d);
                 scene.add(flower);
             }
