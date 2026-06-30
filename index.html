@@ -444,29 +444,199 @@ function createBush(x, z) {
 function createPlayer() {
   playerGroup = new THREE.Group();
 
-  // Body
-  const bodyGeo = new THREE.CylinderGeometry(0.4, 0.4, 1.2, 8);
-  const bodyMat = new THREE.MeshLambertMaterial({ color: 0x4488ff });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
-  body.position.y = 1;
-  body.castShadow = true;
-  playerGroup.add(body);
+  // --- Legs ---
+  [-0.15, 0.15].forEach(xOff => {
+    // Thigh
+    const thighGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.5, 8);
+    const thighMat = new THREE.MeshLambertMaterial({ color: 0x553322 });
+    const thigh = new THREE.Mesh(thighGeo, thighMat);
+    thigh.position.set(xOff, 0.35, 0);
+    playerGroup.add(thigh);
+    // Boot
+    const bootGeo = new THREE.BoxGeometry(0.14, 0.2, 0.2);
+    const bootMat = new THREE.MeshLambertMaterial({ color: 0x332211 });
+    const boot = new THREE.Mesh(bootGeo, bootMat);
+    boot.position.set(xOff, 0.1, 0.03);
+    boot.castShadow = true;
+    playerGroup.add(boot);
+  });
 
-  // Head
-  const headGeo = new THREE.SphereGeometry(0.35, 8, 8);
-  const headMat = new THREE.MeshLambertMaterial({ color: 0xffcc99 });
+  // --- Body / Torso ---
+  const torsoGeo = new THREE.BoxGeometry(0.5, 0.65, 0.3);
+  const torsoMat = new THREE.MeshLambertMaterial({ color: 0x4477cc });
+  const torso = new THREE.Mesh(torsoGeo, torsoMat);
+  torso.position.y = 0.85;
+  torso.castShadow = true;
+  playerGroup.add(torso);
+
+  // Belt
+  const beltGeo = new THREE.BoxGeometry(0.52, 0.08, 0.32);
+  const beltMat = new THREE.MeshLambertMaterial({ color: 0x885522 });
+  const belt = new THREE.Mesh(beltGeo, beltMat);
+  belt.position.y = 0.6;
+  playerGroup.add(belt);
+
+  // Belt buckle
+  const buckleGeo = new THREE.BoxGeometry(0.08, 0.07, 0.02);
+  const buckleMat = new THREE.MeshLambertMaterial({ color: 0xddaa00 });
+  const buckle = new THREE.Mesh(buckleGeo, buckleMat);
+  buckle.position.set(0, 0.6, 0.17);
+  playerGroup.add(buckle);
+
+  // Shoulder pads
+  [-0.32, 0.32].forEach(xOff => {
+    const padGeo = new THREE.SphereGeometry(0.1, 6, 6);
+    const padMat = new THREE.MeshLambertMaterial({ color: 0x888888 });
+    const pad = new THREE.Mesh(padGeo, padMat);
+    pad.position.set(xOff, 1.15, 0);
+    pad.scale.set(1, 0.7, 1);
+    playerGroup.add(pad);
+  });
+
+  // --- Arms ---
+  // Left arm (shield arm)
+  const lArmGeo = new THREE.CylinderGeometry(0.06, 0.07, 0.5, 6);
+  const lArmMat = new THREE.MeshLambertMaterial({ color: 0x4477cc });
+  const lArm = new THREE.Mesh(lArmGeo, lArmMat);
+  lArm.position.set(-0.35, 0.95, 0);
+  lArm.rotation.z = 0.15;
+  playerGroup.add(lArm);
+
+  // Left hand
+  const lHandGeo = new THREE.SphereGeometry(0.06, 6, 6);
+  const lHandMat = new THREE.MeshLambertMaterial({ color: 0xffcc99 });
+  const lHand = new THREE.Mesh(lHandGeo, lHandMat);
+  lHand.position.set(-0.38, 0.7, 0);
+  playerGroup.add(lHand);
+
+  // --- Right arm + Axe (weapon arm) ---
+  const rArmGeo = new THREE.CylinderGeometry(0.06, 0.07, 0.5, 6);
+  const rArmMat = new THREE.MeshLambertMaterial({ color: 0x4477cc });
+  const rArm = new THREE.Mesh(rArmGeo, rArmMat);
+  rArm.position.set(0.35, 0.95, 0);
+  rArm.rotation.z = -0.15;
+  rArm.name = 'rightArm';
+  playerGroup.add(rArm);
+
+  // Right hand
+  const rHandGeo = new THREE.SphereGeometry(0.06, 6, 6);
+  const rHandMat = new THREE.MeshLambertMaterial({ color: 0xffcc99 });
+  const rHand = new THREE.Mesh(rHandGeo, rHandMat);
+  rHand.position.set(0.38, 0.7, 0);
+  rHand.name = 'rightHand';
+  playerGroup.add(rHand);
+
+  // --- Axe (weapon group for swing animation) ---
+  const axeGroup = new THREE.Group();
+  axeGroup.name = 'axeGroup';
+
+  // Axe handle
+  const handleGeo = new THREE.CylinderGeometry(0.03, 0.035, 0.9, 6);
+  const handleMat = new THREE.MeshLambertMaterial({ color: 0x8B5E3C });
+  const handle = new THREE.Mesh(handleGeo, handleMat);
+  handle.position.y = 0;
+  axeGroup.add(handle);
+
+  // Axe blade
+  const bladeShape = new THREE.Shape();
+  bladeShape.moveTo(0, 0);
+  bladeShape.quadraticCurveTo(0.25, 0.15, 0.15, 0.35);
+  bladeShape.quadraticCurveTo(0.05, 0.4, 0, 0.3);
+  const bladeExtrudeSettings = { depth: 0.04, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.01, bevelSegments: 2 };
+  const bladeGeo = new THREE.ExtrudeGeometry(bladeShape, bladeExtrudeSettings);
+  const bladeMat = new THREE.MeshLambertMaterial({ color: 0xaaaaaa, metalness: 0.8 });
+  const blade = new THREE.Mesh(bladeGeo, bladeMat);
+  blade.position.set(0, 0.45, -0.02);
+  blade.castShadow = true;
+  axeGroup.add(blade);
+
+  // Axe blade edge highlight
+  const edgeGeo = new THREE.BoxGeometry(0.2, 0.02, 0.06);
+  const edgeMat = new THREE.MeshLambertMaterial({ color: 0xcccccc });
+  const edge = new THREE.Mesh(edgeGeo, edgeMat);
+  edge.position.set(0.05, 0.55, 0);
+  axeGroup.add(edge);
+
+  // Metal ring on handle
+  const ringGeo = new THREE.TorusGeometry(0.04, 0.01, 6, 8);
+  const ringMat = new THREE.MeshLambertMaterial({ color: 0x888888 });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.position.set(0, 0.35, 0);
+  ring.rotation.x = Math.PI / 2;
+  axeGroup.add(ring);
+
+  axeGroup.position.set(0.42, 0.6, 0.2);
+  axeGroup.rotation.set(-0.5, 0, -0.8);
+  playerGroup.add(axeGroup);
+
+  // --- Head ---
+  const headGeo = new THREE.SphereGeometry(0.22, 12, 10);
+  const headMat = new THREE.MeshLambertMaterial({ color: 0xf0c090 });
   const head = new THREE.Mesh(headGeo, headMat);
-  head.position.y = 1.8;
+  head.position.y = 1.35;
   head.castShadow = true;
+  head.name = 'head';
   playerGroup.add(head);
 
-  // Weapon indicator
-  const weaponGeo = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 4);
-  const weaponMat = new THREE.MeshLambertMaterial({ color: 0xaa6633 });
-  const weapon = new THREE.Mesh(weaponGeo, weaponMat);
-  weapon.position.set(0.6, 1.2, 0);
-  weapon.rotation.z = -0.3;
-  playerGroup.add(weapon);
+  // Hair
+  const hairGeo = new THREE.SphereGeometry(0.23, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.6);
+  const hairMat = new THREE.MeshLambertMaterial({ color: 0x553322 });
+  const hair = new THREE.Mesh(hairGeo, hairMat);
+  hair.position.y = 1.4;
+  playerGroup.add(hair);
+
+  // Eyes
+  [-0.08, 0.08].forEach(xOff => {
+    const eyeWhiteGeo = new THREE.SphereGeometry(0.04, 6, 6);
+    const eyeWhiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const eyeWhite = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
+    eyeWhite.position.set(xOff, 1.37, 0.2);
+    playerGroup.add(eyeWhite);
+
+    const pupilGeo = new THREE.SphereGeometry(0.02, 6, 6);
+    const pupilMat = new THREE.MeshLambertMaterial({ color: 0x221100 });
+    const pupil = new THREE.Mesh(pupilGeo, pupilMat);
+    pupil.position.set(xOff, 1.37, 0.23);
+    playerGroup.add(pupil);
+  });
+
+  // Nose
+  const noseGeo = new THREE.SphereGeometry(0.03, 6, 6);
+  const noseMat = new THREE.MeshLambertMaterial({ color: 0xe0a070 });
+  const nose = new THREE.Mesh(noseGeo, noseMat);
+  nose.position.set(0, 1.33, 0.23);
+  playerGroup.add(nose);
+
+  // Mouth
+  const mouthGeo = new THREE.BoxGeometry(0.08, 0.015, 0.01);
+  const mouthMat = new THREE.MeshLambertMaterial({ color: 0xcc6666 });
+  const mouth = new THREE.Mesh(mouthGeo, mouthMat);
+  mouth.position.set(0, 1.29, 0.22);
+  playerGroup.add(mouth);
+
+  // Helmet / Headband
+  const headbandGeo = new THREE.TorusGeometry(0.23, 0.02, 6, 16);
+  const headbandMat = new THREE.MeshLambertMaterial({ color: 0xcc4444 });
+  const headband = new THREE.Mesh(headbandGeo, headbandMat);
+  headband.position.y = 1.42;
+  headband.rotation.x = Math.PI / 2;
+  playerGroup.add(headband);
+
+  // --- Cape ---
+  const capeGeo = new THREE.PlaneGeometry(0.4, 0.6, 1, 4);
+  const capeMat = new THREE.MeshLambertMaterial({ color: 0xcc2222, side: THREE.DoubleSide });
+  const cape = new THREE.Mesh(capeGeo, capeMat);
+  cape.position.set(0, 0.85, -0.2);
+  cape.name = 'cape';
+  playerGroup.add(cape);
+
+  // --- Shadow circle ---
+  const shadowGeo = new THREE.CircleGeometry(0.35, 12);
+  const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3 });
+  const shadow = new THREE.Mesh(shadowGeo, shadowMat);
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.01;
+  playerGroup.add(shadow);
 
   playerGroup.position.set(0, 0, 0);
   playerMesh = playerGroup;
@@ -477,43 +647,206 @@ function createPlayer() {
 function createBear(x, z, isBoss) {
   const group = new THREE.Group();
   const scale = isBoss ? 1.8 : 1;
+  const bodyColor = isBoss ? 0x8B0000 : 0x8B4513;
+  const darkColor = isBoss ? 0x660000 : 0x6B3410;
+  const lightColor = isBoss ? 0xaa2222 : 0x996633;
+  const muzzleColor = isBoss ? 0xcc6644 : 0xCCAA88;
 
-  // Body
-  const bodyGeo = new THREE.SphereGeometry(0.8, 8, 8);
-  const bodyMat = new THREE.MeshLambertMaterial({ color: isBoss ? 0x8B0000 : 0x8B4513 });
+  // --- Shadow on ground ---
+  const shadowGeo = new THREE.CircleGeometry(0.7, 12);
+  const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25 });
+  const shadow = new THREE.Mesh(shadowGeo, shadowMat);
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.01;
+  group.add(shadow);
+
+  // --- Rear legs ---
+  [-0.35, 0.35].forEach(xOff => {
+    const legGeo = new THREE.CylinderGeometry(0.13, 0.15, 0.6, 8);
+    const legMat = new THREE.MeshLambertMaterial({ color: darkColor });
+    const leg = new THREE.Mesh(legGeo, legMat);
+    leg.position.set(xOff, 0.35, -0.35);
+    leg.rotation.x = 0.15;
+    leg.castShadow = true;
+    group.add(leg);
+
+    // Paw
+    const pawGeo = new THREE.SphereGeometry(0.14, 6, 6);
+    const pawMat = new THREE.MeshLambertMaterial({ color: darkColor });
+    const paw = new THREE.Mesh(pawGeo, pawMat);
+    paw.position.set(xOff, 0.08, -0.3);
+    paw.scale.set(1, 0.6, 1.3);
+    group.add(paw);
+
+    // Claws
+    [-0.06, 0, 0.06].forEach(cx => {
+      const clawGeo = new THREE.ConeGeometry(0.015, 0.08, 4);
+      const clawMat = new THREE.MeshLambertMaterial({ color: 0x222222 });
+      const claw = new THREE.Mesh(clawGeo, clawMat);
+      claw.position.set(xOff + cx, 0.04, -0.2);
+      claw.rotation.x = Math.PI;
+      group.add(claw);
+    });
+  });
+
+  // --- Front legs ---
+  [-0.35, 0.35].forEach(xOff => {
+    const legGeo = new THREE.CylinderGeometry(0.15, 0.13, 0.7, 8);
+    const legMat = new THREE.MeshLambertMaterial({ color: bodyColor });
+    const leg = new THREE.Mesh(legGeo, legMat);
+    leg.position.set(xOff, 0.4, 0.35);
+    leg.castShadow = true;
+    group.add(leg);
+
+    // Paw
+    const pawGeo = new THREE.SphereGeometry(0.16, 6, 6);
+    const pawMat = new THREE.MeshLambertMaterial({ color: darkColor });
+    const paw = new THREE.Mesh(pawGeo, pawMat);
+    paw.position.set(xOff, 0.08, 0.4);
+    paw.scale.set(1, 0.6, 1.4);
+    group.add(paw);
+
+    // Claws
+    [-0.07, 0, 0.07].forEach(cx => {
+      const clawGeo = new THREE.ConeGeometry(0.018, 0.1, 4);
+      const clawMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+      const claw = new THREE.Mesh(clawGeo, clawMat);
+      claw.position.set(xOff + cx, 0.04, 0.5);
+      claw.rotation.x = Math.PI;
+      group.add(claw);
+    });
+  });
+
+  // --- Body (torso) ---
+  const bodyGeo = new THREE.SphereGeometry(0.7, 12, 10);
+  const bodyMat = new THREE.MeshLambertMaterial({ color: bodyColor });
   const body = new THREE.Mesh(bodyGeo, bodyMat);
-  body.position.y = 1;
-  body.scale.set(1, 0.9, 1.3);
+  body.position.y = 0.95;
+  body.scale.set(1, 0.85, 1.35);
   body.castShadow = true;
   group.add(body);
 
-  // Head
-  const headGeo = new THREE.SphereGeometry(0.45, 8, 8);
-  const headMat = new THREE.MeshLambertMaterial({ color: isBoss ? 0xaa2222 : 0x995533 });
+  // Belly (lighter fur)
+  const bellyGeo = new THREE.SphereGeometry(0.5, 8, 8);
+  const bellyMat = new THREE.MeshLambertMaterial({ color: muzzleColor });
+  const belly = new THREE.Mesh(bellyGeo, bellyMat);
+  belly.position.set(0, 0.75, 0.15);
+  belly.scale.set(0.8, 0.7, 0.8);
+  group.add(belly);
+
+  // Shoulder hump
+  const humpGeo = new THREE.SphereGeometry(0.35, 8, 8);
+  const humpMat = new THREE.MeshLambertMaterial({ color: darkColor });
+  const hump = new THREE.Mesh(humpGeo, humpMat);
+  hump.position.set(0, 1.35, -0.1);
+  hump.scale.set(1, 0.7, 0.8);
+  group.add(hump);
+
+  // --- Neck ---
+  const neckGeo = new THREE.CylinderGeometry(0.35, 0.45, 0.4, 8);
+  const neckMat = new THREE.MeshLambertMaterial({ color: bodyColor });
+  const neck = new THREE.Mesh(neckGeo, neckMat);
+  neck.position.set(0, 1.2, 0.45);
+  neck.rotation.x = 0.6;
+  group.add(neck);
+
+  // --- Head ---
+  const headGeo = new THREE.SphereGeometry(0.4, 10, 8);
+  const headMat = new THREE.MeshLambertMaterial({ color: lightColor });
   const head = new THREE.Mesh(headGeo, headMat);
-  head.position.set(0, 1.3, 0.7);
+  head.position.set(0, 1.4, 0.75);
   head.castShadow = true;
   group.add(head);
 
+  // Snout / Muzzle
+  const muzzleGeo = new THREE.SphereGeometry(0.2, 8, 8);
+  const muzzleMat = new THREE.MeshLambertMaterial({ color: muzzleColor });
+  const muzzle = new THREE.Mesh(muzzleGeo, muzzleMat);
+  muzzle.position.set(0, 1.3, 1.1);
+  muzzle.scale.set(1, 0.8, 1.2);
+  group.add(muzzle);
+
+  // Nose
+  const noseGeo = new THREE.SphereGeometry(0.06, 6, 6);
+  const noseMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+  const nose = new THREE.Mesh(noseGeo, noseMat);
+  nose.position.set(0, 1.35, 1.28);
+  group.add(nose);
+
+  // Mouth line
+  const mouthGeo = new THREE.BoxGeometry(0.12, 0.01, 0.01);
+  const mouthMat = new THREE.MeshLambertMaterial({ color: 0x332211 });
+  const mouth = new THREE.Mesh(mouthGeo, mouthMat);
+  mouth.position.set(0, 1.25, 1.25);
+  group.add(mouth);
+
   // Eyes
-  [-0.15, 0.15].forEach(offset => {
-    const eyeGeo = new THREE.SphereGeometry(0.06, 4, 4);
-    const eyeMat = new THREE.MeshLambertMaterial({ color: 0xffff00 });
-    const eye = new THREE.Mesh(eyeGeo, eyeMat);
-    eye.position.set(offset, 1.35, 1.1);
-    group.add(eye);
+  [-0.17, 0.17].forEach(offset => {
+    // Eye white
+    const eyeWhiteGeo = new THREE.SphereGeometry(0.06, 8, 6);
+    const eyeWhiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const eyeWhite = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
+    eyeWhite.position.set(offset, 1.48, 1.0);
+    group.add(eyeWhite);
+
+    // Pupil
+    const pupilGeo = new THREE.SphereGeometry(0.035, 6, 6);
+    const pupilMat = new THREE.MeshLambertMaterial({ color: isBoss ? 0xff0000 : 0x111100 });
+    const pupil = new THREE.Mesh(pupilGeo, pupilMat);
+    pupil.position.set(offset, 1.48, 1.06);
+    group.add(pupil);
+
+    // Eyebrow ridge
+    const browGeo = new THREE.BoxGeometry(0.1, 0.03, 0.06);
+    const browMat = new THREE.MeshLambertMaterial({ color: darkColor });
+    const brow = new THREE.Mesh(browGeo, browMat);
+    brow.position.set(offset, 1.54, 1.02);
+    brow.rotation.z = offset > 0 ? -0.2 : 0.2;
+    group.add(brow);
   });
 
   // Ears
-  [-0.3, 0.3].forEach(offset => {
-    const earGeo = new THREE.SphereGeometry(0.12, 4, 4);
-    const earMat = new THREE.MeshLambertMaterial({ color: isBoss ? 0xaa3333 : 0x774422 });
+  [-0.28, 0.28].forEach(offset => {
+    // Outer ear
+    const earGeo = new THREE.SphereGeometry(0.1, 6, 6);
+    const earMat = new THREE.MeshLambertMaterial({ color: darkColor });
     const ear = new THREE.Mesh(earGeo, earMat);
-    ear.position.set(offset, 1.65, 0.6);
+    ear.position.set(offset, 1.7, 0.65);
+    ear.scale.set(0.8, 1, 0.5);
     group.add(ear);
+
+    // Inner ear
+    const innerEarGeo = new THREE.SphereGeometry(0.06, 6, 6);
+    const innerEarMat = new THREE.MeshLambertMaterial({ color: 0xdd9988 });
+    const innerEar = new THREE.Mesh(innerEarGeo, innerEarMat);
+    innerEar.position.set(offset, 1.7, 0.7);
+    innerEar.scale.set(0.6, 0.8, 0.4);
+    group.add(innerEar);
   });
 
-  // HP bar
+  // --- Tail ---
+  const tailGeo = new THREE.SphereGeometry(0.1, 6, 6);
+  const tailMat = new THREE.MeshLambertMaterial({ color: darkColor });
+  const tail = new THREE.Mesh(tailGeo, tailMat);
+  tail.position.set(0, 1.0, -0.9);
+  tail.scale.set(0.8, 0.8, 1.2);
+  group.add(tail);
+
+  // --- Fur texture stripes (subtle darker patches) ---
+  for (let i = 0; i < 5; i++) {
+    const stripeGeo = new THREE.BoxGeometry(0.08, 0.02, 0.3);
+    const stripeMat = new THREE.MeshLambertMaterial({ color: darkColor, transparent: true, opacity: 0.4 });
+    const stripe = new THREE.Mesh(stripeGeo, stripeMat);
+    stripe.position.set(
+      (Math.random() - 0.5) * 0.4,
+      1.0 + Math.random() * 0.3,
+      (Math.random() - 0.5) * 0.5
+    );
+    stripe.rotation.set(Math.random(), Math.random(), Math.random());
+    group.add(stripe);
+  }
+
+  // --- HP bar ---
   const hpBarBg = new THREE.Mesh(
     new THREE.PlaneGeometry(1.2, 0.12),
     new THREE.MeshBasicMaterial({ color: 0x333333 })
@@ -528,6 +861,28 @@ function createBear(x, z, isBoss) {
   );
   hpBarFill.position.set(0, 2.2, 0.01);
   group.add(hpBarFill);
+
+  // --- Boss crown ---
+  if (isBoss) {
+    const crownGeo = new THREE.CylinderGeometry(0.15, 0.2, 0.15, 5);
+    const crownMat = new THREE.MeshLambertMaterial({ color: 0xffdd00, emissive: 0xaa8800, emissiveIntensity: 0.3 });
+    const crown = new THREE.Mesh(crownGeo, crownMat);
+    crown.position.set(0, 1.85, 0.75);
+    group.add(crown);
+    // Crown points
+    for (let i = 0; i < 5; i++) {
+      const angle = (i / 5) * Math.PI * 2;
+      const pointGeo = new THREE.ConeGeometry(0.03, 0.1, 4);
+      const pointMat = new THREE.MeshLambertMaterial({ color: 0xffdd00 });
+      const point = new THREE.Mesh(pointGeo, pointMat);
+      point.position.set(
+        Math.cos(angle) * 0.14,
+        2.0,
+        0.75 + Math.sin(angle) * 0.14
+      );
+      group.add(point);
+    }
+  }
 
   const hp = isBoss ? 80 + G.wave * 30 : 30 + G.wave * 10;
   const dmg = isBoss ? 20 + G.wave * 5 : 8 + G.wave * 2;
@@ -718,12 +1073,14 @@ function attack() {
   const dmg = Math.floor(G.atk * weapon.dmgMult);
   const dir = new THREE.Vector3(-Math.sin(cameraAngle), 0, -Math.cos(cameraAngle));
 
-  // Attack animation - weapon swing
-  if (playerMesh.children[2]) {
-    const wp = playerMesh.children[2];
-    const origRot = wp.rotation.z;
-    wp.rotation.z = -1.5;
-    setTimeout(() => { wp.rotation.z = origRot; }, 150);
+  // Attack animation - axe swing
+  const axe = playerMesh.getObjectByName('axeGroup');
+  if (axe) {
+    const origRotX = axe.rotation.x;
+    const origRotZ = axe.rotation.z;
+    axe.rotation.x = -2.0;
+    axe.rotation.z = -0.3;
+    setTimeout(() => { axe.rotation.x = origRotX; axe.rotation.z = origRotZ; }, 180);
   }
 
   // Check hits
