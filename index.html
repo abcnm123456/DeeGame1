@@ -2,47 +2,49 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>3D 無限獵熊</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { overflow: hidden; background: #000; font-family: 'Microsoft JhengHei', 'Arial', sans-serif; }
-        canvas { display: block; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { overflow: hidden; background: #000; font-family: 'Microsoft JhengHei', 'Arial', sans-serif; touch-action: none; user-select: none; -webkit-user-select: none; }
+        canvas { display: block; touch-action: none; }
 
+        /* UI 面板 */
         #scoreBoard {
-            position: fixed; top: 20px; left: 20px; z-index: 100;
+            position: fixed; top: 10px; left: 10px; z-index: 100;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-            padding: 14px 22px; border-radius: 16px;
-            border: 2px solid rgba(255,255,255,0.15);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4); color: #fff;
+            padding: 8px 14px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4); color: #fff;
         }
-        #scoreBoard h2 { font-size: 14px; color: #aaa; margin-bottom: 4px; }
-        #scoreBoard .score { font-size: 28px; font-weight: bold; color: #FFD700; text-shadow: 0 2px 8px rgba(255,215,0,0.4); }
+        #scoreBoard h2 { font-size: 11px; color: #aaa; margin-bottom: 2px; }
+        #scoreBoard .score { font-size: 22px; font-weight: bold; color: #FFD700; text-shadow: 0 2px 8px rgba(255,215,0,0.4); }
 
         #ui {
-            position: fixed; top: 20px; right: 20px; z-index: 100;
-            display: flex; align-items: center; gap: 12px;
+            position: fixed; top: 10px; right: 10px; z-index: 100;
+            display: flex; align-items: center; gap: 8px;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-            padding: 14px 22px; border-radius: 16px;
-            border: 2px solid rgba(255,255,255,0.15);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            padding: 8px 14px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
         }
         #backpack {
-            width: 56px; height: 56px;
+            width: 40px; height: 40px;
             background: linear-gradient(135deg, #8B4513, #A0522D);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 28px; border: 2px solid #D2691E;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; border: 2px solid #D2691E;
             box-shadow: 0 4px 12px rgba(139,69,19,0.5);
             transition: transform 0.15s;
         }
-        #meatCount { color: #fff; font-size: 28px; font-weight: bold; text-shadow: 0 2px 8px rgba(0,0,0,0.5); min-width: 40px; text-align: center; }
-        #meatIcon { font-size: 24px; }
+        #meatCount { color: #fff; font-size: 22px; font-weight: bold; text-shadow: 0 2px 8px rgba(0,0,0,0.5); min-width: 30px; text-align: center; }
+        #meatIcon { font-size: 18px; }
 
+        /* 操作提示 - 電腦版 */
         #controls {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
             z-index: 100; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
-            padding: 10px 24px; border-radius: 12px;
-            color: rgba(255,255,255,0.7); font-size: 13px;
+            padding: 6px 16px; border-radius: 10px;
+            color: rgba(255,255,255,0.6); font-size: 11px;
             pointer-events: none; text-align: center;
             border: 1px solid rgba(255,255,255,0.1);
         }
@@ -50,19 +52,19 @@
 
         /* 攻擊範圍指示器 */
         #attackRange {
-            position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
             z-index: 100; pointer-events: none;
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 6px;
             opacity: 0; transition: opacity 0.2s;
         }
         #attackRange.active { opacity: 1; }
         #attackRangeDot {
-            width: 10px; height: 10px; border-radius: 50%;
+            width: 8px; height: 8px; border-radius: 50%;
             background: #FF4444;
             box-shadow: 0 0 8px #FF4444;
             animation: pulse 0.6s infinite alternate;
         }
-        #attackRangeText { color: #FF8888; font-size: 12px; font-weight: bold; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+        #attackRangeText { color: #FF8888; font-size: 11px; font-weight: bold; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
 
         @keyframes pulse {
             from { transform: scale(0.8); opacity: 0.6; }
@@ -72,26 +74,103 @@
         /* 攻擊命中提示 */
         .hitMarker {
             position: fixed; pointer-events: none; z-index: 200;
-            color: #FF4444; font-size: 24px; font-weight: bold;
+            color: #FF4444; font-size: 20px; font-weight: bold;
             text-shadow: 0 0 10px rgba(255,0,0,0.8);
             animation: hitFloat 0.8s forwards;
         }
         @keyframes hitFloat {
             0% { transform: translateY(0) scale(0.5); opacity: 1; }
-            100% { transform: translateY(-60px) scale(1.2); opacity: 0; }
+            100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
         }
 
         /* 冷卻指示條 */
         #cooldownBar {
-            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
             z-index: 100; pointer-events: none;
-            width: 120px; height: 4px; background: rgba(255,255,255,0.15);
+            width: 100px; height: 3px; background: rgba(255,255,255,0.15);
             border-radius: 2px; overflow: hidden; opacity: 0; transition: opacity 0.2s;
         }
         #cooldownBar.active { opacity: 1; }
         #cooldownFill {
             height: 100%; width: 100%; background: #FFD700;
             border-radius: 2px; transition: width 0.05s linear;
+        }
+
+        /* ============ 虛擬搖桿 ============ */
+        #joystickArea {
+            position: fixed; bottom: 20px; left: 20px;
+            width: 130px; height: 130px; z-index: 150;
+            display: none; /* 手機上才顯示 */
+        }
+        #joystickBase {
+            position: absolute; width: 120px; height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.25);
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        #joystickThumb {
+            position: absolute; width: 50px; height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.35);
+            border: 2px solid rgba(255,255,255,0.5);
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            transition: none;
+        }
+        #joystickLabel {
+            position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.3); font-size: 10px; white-space: nowrap;
+        }
+
+        /* ============ 攻擊按鈕 ============ */
+        #attackBtn {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 70px; height: 70px; border-radius: 50%; z-index: 150;
+            background: rgba(255,50,50,0.3);
+            border: 3px solid rgba(255,100,100,0.6);
+            display: none; /* 手機上才顯示 */
+            align-items: center; justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 0 20px rgba(255,0,0,0.3);
+            transition: transform 0.1s, background 0.1s;
+        }
+        #attackBtn:active {
+            transform: scale(0.9);
+            background: rgba(255,50,50,0.6);
+        }
+
+        /* ============ 電腦/手機偵測提示 ============ */
+        #deviceHint {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 300; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            padding: 30px 40px; border-radius: 20px;
+            border: 2px solid rgba(255,215,0,0.4);
+            color: #fff; text-align: center;
+            display: none;
+        }
+        #deviceHint h2 { color: #FFD700; margin-bottom: 10px; font-size: 18px; }
+        #deviceHint p { font-size: 14px; color: #ccc; margin: 6px 0; }
+        #deviceHint .emoji { font-size: 40px; margin-bottom: 10px; }
+        #deviceHint button {
+            margin-top: 15px; padding: 10px 30px; border-radius: 10px;
+            background: #FFD700; color: #333; border: none;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+        }
+
+        /* 手機模式樣式 */
+        @media (max-width: 768px), (hover: none) and (pointer: coarse) {
+            #joystickArea { display: block; }
+            #attackBtn { display: flex; }
+            #controls { display: none; }
+            #cooldownBar { bottom: 130px; }
+            #attackRange { bottom: 160px; }
+            #scoreBoard { top: 8px; left: 8px; padding: 6px 10px; }
+            #scoreBoard h2 { font-size: 9px; }
+            #scoreBoard .score { font-size: 18px; }
+            #ui { top: 8px; right: 8px; padding: 6px 10px; gap: 6px; }
+            #backpack { width: 32px; height: 32px; font-size: 16px; }
+            #meatCount { font-size: 18px; }
+            #meatIcon { font-size: 14px; }
         }
     </style>
 </head>
@@ -110,6 +189,16 @@
     </div>
     <div id="attackRange"><div id="attackRangeDot"></div><span id="attackRangeText">接近獵物中...</span></div>
     <div id="cooldownBar"><div id="cooldownFill"></div></div>
+
+    <!-- 虛擬搖桿 -->
+    <div id="joystickArea">
+        <div id="joystickLabel">移動</div>
+        <div id="joystickBase"></div>
+        <div id="joystickThumb"></div>
+    </div>
+
+    <!-- 攻擊按鈕 -->
+    <div id="attackBtn">⚔️</div>
 
     <script type="importmap">
     {
@@ -138,10 +227,23 @@
         const SPAWN_DELAY = 0.5;
         const FLY_DURATION = 1.0;
         const ATTACK_RANGE = 6;
-        const ATTACK_COOLDOWN = 1200; // 攻擊冷卻 1.2 秒
+        const ATTACK_COOLDOWN = 1200;
         let lastAttackTime = 0;
         let isAttacking = false;
         let cameraTarget = new THREE.Vector3(0, 0, 0);
+
+        // ============ 手機觸控 ============
+        let joystickInput = { x: 0, y: 0 }; // -1 到 1
+        let isJoystickActive = false;
+        let joystickTouchId = null;
+        let cameraTouchId = null;
+        let cameraAngle = 0; // 攝影機繞角色的角度
+        let cameraPitch = 0.7; // 攝影機仰角
+        let lastCameraTouchX = 0;
+        let lastCameraTouchY = 0;
+
+        // 判斷是否為觸控裝置
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
         // ============ 初始化場景 ============
         function init() {
@@ -160,7 +262,6 @@
             renderer.toneMappingExposure = 1.1;
             document.body.appendChild(renderer.domElement);
 
-            // 光源
             scene.add(new THREE.AmbientLight(0xffffff, 0.5));
             const sun = new THREE.DirectionalLight(0xfff4e0, 1.2);
             sun.position.set(20, 35, 15);
@@ -188,12 +289,158 @@
 
             for (let i = 0; i < 3; i++) spawnBear();
 
+            // 事件綁定
             window.addEventListener('resize', onResize);
             window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
             window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
             renderer.domElement.addEventListener('contextmenu', e => e.preventDefault());
 
+            // 手機觸控事件
+            setupTouchControls();
+
             animate();
+        }
+
+        // ============ 觸控控制設定 ============
+        function setupTouchControls() {
+            const joystickArea = document.getElementById('joystickArea');
+            const joystickThumb = document.getElementById('joystickThumb');
+            const attackBtn = document.getElementById('attackBtn');
+
+            const JOYSTICK_RADIUS = 40; // 搖桿最大移動半徑（像素）
+            let joystickCenter = { x: 0, y: 0 };
+
+            // ---- 虛擬搖桿 ----
+            joystickArea.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const touch = e.changedTouches[0];
+                joystickTouchId = touch.identifier;
+                isJoystickActive = true;
+
+                const rect = joystickArea.getBoundingClientRect();
+                joystickCenter = {
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2
+                };
+                updateJoystick(touch.clientX, touch.clientY);
+            }, { passive: false });
+
+            window.addEventListener('touchmove', (e) => {
+                // 虛擬搖桿移動
+                for (let i = 0; i < e.touches.length; i++) {
+                    if (e.touches[i].identifier === joystickTouchId) {
+                        e.preventDefault();
+                        updateJoystick(e.touches[i].clientX, e.touches[i].clientY);
+                        break;
+                    }
+                }
+                // 攝影機旋轉
+                for (let i = 0; i < e.touches.length; i++) {
+                    if (e.touches[i].identifier === cameraTouchId) {
+                        e.preventDefault();
+                        const dx = e.touches[i].clientX - lastCameraTouchX;
+                        const dy = e.touches[i].clientY - lastCameraTouchY;
+                        cameraAngle -= dx * 0.005;
+                        cameraPitch = Math.max(0.3, Math.min(1.2, cameraPitch + dy * 0.005));
+                        lastCameraTouchX = e.touches[i].clientX;
+                        lastCameraTouchY = e.touches[i].clientY;
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            window.addEventListener('touchend', (e) => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const touch = e.changedTouches[i];
+                    if (touch.identifier === joystickTouchId) {
+                        joystickTouchId = null;
+                        isJoystickActive = false;
+                        joystickInput.x = 0;
+                        joystickInput.y = 0;
+                        joystickThumb.style.transform = 'translate(-50%, -50%)';
+                    }
+                    if (touch.identifier === cameraTouchId) {
+                        cameraTouchId = null;
+                    }
+                }
+            }, { passive: false });
+
+            window.addEventListener('touchcancel', (e) => {
+                joystickTouchId = null;
+                cameraTouchId = null;
+                isJoystickActive = false;
+                joystickInput.x = 0;
+                joystickInput.y = 0;
+                joystickThumb.style.transform = 'translate(-50%, -50%)';
+            }, { passive: false });
+
+            function updateJoystick(touchX, touchY) {
+                let dx = touchX - joystickCenter.x;
+                let dy = touchY - joystickCenter.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist > JOYSTICK_RADIUS) {
+                    dx = dx / dist * JOYSTICK_RADIUS;
+                    dy = dy / dist * JOYSTICK_RADIUS;
+                }
+
+                joystickThumb.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+                // 正規化到 -1 ~ 1
+                joystickInput.x = dx / JOYSTICK_RADIUS;
+                joystickInput.y = dy / JOYSTICK_RADIUS;
+            }
+
+            // ---- 攝影機旋轉（右半螢幕觸控） ----
+            renderer.domElement.addEventListener('touchstart', (e) => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const touch = e.changedTouches[i];
+                    // 右半螢幕開始觸控 → 旋轉攝影機
+                    if (touch.clientX > window.innerWidth / 2) {
+                        if (cameraTouchId === null) {
+                            cameraTouchId = touch.identifier;
+                            lastCameraTouchX = touch.clientX;
+                            lastCameraTouchY = touch.clientY;
+                        }
+                    }
+                }
+            }, { passive: true });
+
+            // ---- 攻擊按鈕 ----
+            attackBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // 手動觸發攻擊
+                tryManualAttack();
+            }, { passive: false });
+        }
+
+        // ============ 手動攻擊（按鈕觸發） ============
+        function tryManualAttack() {
+            const now = Date.now();
+            if (isAttacking) return;
+            if (now - lastAttackTime < ATTACK_COOLDOWN) return;
+
+            let closest = null, minDist = ATTACK_RANGE;
+            for (const b of bears) {
+                if (b.userData.dying || b.userData.beingHit) continue;
+                const d = player.position.distanceTo(b.position);
+                if (d < minDist) { minDist = d; closest = b; }
+            }
+
+            if (!closest) return;
+
+            isAttacking = true;
+            lastAttackTime = now;
+            player.userData.attacking = true;
+            player.userData.attackTarget = closest;
+            player.userData.attackStartTime = now;
+            player.userData.attackDuration = 600;
+
+            const dir = new THREE.Vector3().subVectors(closest.position, player.position);
+            dir.y = 0;
+            player.rotation.y = Math.atan2(dir.x, dir.z);
         }
 
         // ============ 主角角色 ============
@@ -207,15 +454,11 @@
             const pantsMat = new THREE.MeshLambertMaterial({ color: 0x334455 });
             const shoeMat = new THREE.MeshLambertMaterial({ color: 0x553322 });
 
-            // 頭
             const head = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), skinMat);
             head.position.y = 2.2; head.castShadow = true; g.add(head);
-
-            // 頭髮
             const hair = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.35, 0.75), hairMat);
             hair.position.y = 2.55; hair.castShadow = true; g.add(hair);
 
-            // 眼睛
             const eyeMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
             const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.05), eyeMat);
             eyeL.position.set(-0.15, 2.25, 0.36); g.add(eyeL);
@@ -228,48 +471,38 @@
             const ewR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.03), eyeWhiteMat);
             ewR.position.set(0.15, 2.25, 0.35); g.add(ewR);
 
-            // 嘴巴
             const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.06, 0.05), new THREE.MeshLambertMaterial({ color: 0xCC6666 }));
             mouth.position.set(0, 2.08, 0.36); g.add(mouth);
 
-            // 身體
             const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.0, 0.5), bodyMat);
             body.position.y = 1.45; body.castShadow = true; g.add(body);
 
-            // 手臂
             const armL = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.85, 0.25), bodyMat);
             armL.position.set(-0.53, 1.5, 0); armL.castShadow = true; g.add(armL);
             const armR = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.85, 0.25), bodyMat);
             armR.position.set(0.53, 1.5, 0); armR.castShadow = true; g.add(armR);
 
-            // 手
             const handL = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), skinMat);
             handL.position.set(-0.53, 1.02, 0); g.add(handL);
             const handR = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), skinMat);
             handR.position.set(0.53, 1.02, 0); g.add(handR);
 
-            // 褲子/腿
             const legL = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.7, 0.32), pantsMat);
             legL.position.set(-0.2, 0.55, 0); legL.castShadow = true; g.add(legL);
             const legR = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.7, 0.32), pantsMat);
             legR.position.set(0.2, 0.55, 0); legR.castShadow = true; g.add(legR);
 
-            // 鞋子
             const shoeL = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.18, 0.42), shoeMat);
             shoeL.position.set(-0.2, 0.1, 0.04); g.add(shoeL);
             const shoeR = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.18, 0.42), shoeMat);
             shoeR.position.set(0.2, 0.1, 0.04); g.add(shoeR);
 
-            // 斧頭
             const axeGroup = new THREE.Group();
             const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.7, 6), new THREE.MeshLambertMaterial({ color: 0x8B6914 }));
-            handle.rotation.z = 0.3;
-            axeGroup.add(handle);
+            handle.rotation.z = 0.3; axeGroup.add(handle);
             const blade = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.06), new THREE.MeshLambertMaterial({ color: 0xAAAAAA }));
-            blade.position.set(0.15, 0.3, 0);
-            axeGroup.add(blade);
-            axeGroup.position.set(0.72, 1.7, 0);
-            g.add(axeGroup);
+            blade.position.set(0.15, 0.3, 0); axeGroup.add(blade);
+            axeGroup.position.set(0.72, 1.7, 0); g.add(axeGroup);
 
             g.userData.parts = { armL, armR, legL, legR, axeGroup };
             return g;
@@ -281,9 +514,7 @@
                 new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE, 60, 60),
                 new THREE.MeshLambertMaterial({ color: 0x4a7023 })
             );
-            g.rotation.x = -Math.PI / 2;
-            g.receiveShadow = true;
-            scene.add(g);
+            g.rotation.x = -Math.PI / 2; g.receiveShadow = true; scene.add(g);
 
             const pColors = [0x5a8a2a, 0x3d6018, 0x6a9a35, 0x528020];
             for (let i = 0; i < 50; i++) {
@@ -308,10 +539,7 @@
             ];
             positions.forEach(([x, y, z]) => {
                 const t = new THREE.Group();
-                const trunk = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.25, 0.4, 3, 8),
-                    new THREE.MeshLambertMaterial({ color: 0x6B3A1F })
-                );
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.4, 3, 8), new THREE.MeshLambertMaterial({ color: 0x6B3A1F }));
                 trunk.position.y = 1.5; trunk.castShadow = true; t.add(trunk);
                 const lc = [0x228B22, 0x2E8B2E, 0x1E7A1E];
                 [[0, 4, 0], [-0.5, 3.5, 0.3], [0.4, 3.6, -0.3]].forEach(([lx, ly, lz], i) => {
@@ -336,7 +564,7 @@
             }
         }
 
-        // ============ 創建花朵裝飾 ============
+        // ============ 創建花朵 ============
         function createFlowers() {
             const colors = [0xFF69B4, 0xFFD700, 0xFF6347, 0xDA70D6, 0x87CEEB, 0xFFFFFF];
             for (let i = 0; i < 40; i++) {
@@ -359,10 +587,8 @@
 
             const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.4, 1.2), new THREE.MeshLambertMaterial({ color: bc }));
             body.position.y = 1.3; body.castShadow = true; bear.add(body);
-
             const belly = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.9, 0.1), new THREE.MeshLambertMaterial({ color: bc2 }));
             belly.position.set(0, 1.2, 0.65); bear.add(belly);
-
             const head = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.1, 1.0), new THREE.MeshLambertMaterial({ color: hc }));
             head.position.y = 2.55; head.castShadow = true; bear.add(head);
 
@@ -433,29 +659,24 @@
             if (isAttacking) return;
             if (now - lastAttackTime < ATTACK_COOLDOWN) return;
 
-            // 找最近的活熊
             let closest = null, minDist = ATTACK_RANGE;
             for (const b of bears) {
                 if (b.userData.dying || b.userData.beingHit) continue;
                 const d = player.position.distanceTo(b.position);
                 if (d < minDist) { minDist = d; closest = b; }
             }
-
             if (!closest) return;
 
-            // 開始攻擊
             isAttacking = true;
             lastAttackTime = now;
             player.userData.attacking = true;
             player.userData.attackTarget = closest;
             player.userData.attackStartTime = now;
-            player.userData.attackDuration = 600; // 攻擊動畫 0.6 秒
+            player.userData.attackDuration = 600;
 
-            // 玩家朝向熊
             const dir = new THREE.Vector3().subVectors(closest.position, player.position);
             dir.y = 0;
-            const targetAngle = Math.atan2(dir.x, dir.z);
-            player.rotation.y = targetAngle;
+            player.rotation.y = Math.atan2(dir.x, dir.z);
         }
 
         // ============ 攻擊命中處理 ============
@@ -463,14 +684,9 @@
             if (bear.userData.dying || bear.userData.beingHit) return;
             bear.userData.beingHit = true;
             bear.userData.hitStartTime = Date.now();
-            bear.userData.hitDuration = 500; // 倒下動畫 0.5 秒
-
-            // 顯示傷害數字
+            bear.userData.hitDuration = 500;
             showDamageNumber(bear.position);
-
-            // 攻擊特效
             createHitEffect(bear.position.clone().add(new THREE.Vector3(0, 1.5, 0)));
-
             killScore++;
             document.getElementById('killCount').textContent = killScore;
         }
@@ -482,7 +698,6 @@
             pos.project(camera);
             const sx = (pos.x * 0.5 + 0.5) * window.innerWidth;
             const sy = (-pos.y * 0.5 + 0.5) * window.innerHeight;
-
             const el = document.createElement('div');
             el.className = 'hitMarker';
             el.textContent = '⚔️ -1';
@@ -494,53 +709,32 @@
 
         // ============ 攻擊命中特效 ============
         function createHitEffect(position) {
-            // 閃光
-            const flash = new THREE.Mesh(
-                new THREE.SphereGeometry(0.8, 8, 8),
-                new THREE.MeshBasicMaterial({ color: 0xFFFF00, transparent: true, opacity: 0.8 })
-            );
-            flash.position.copy(position);
-            scene.add(flash);
-
-            // 散射粒子
+            const flash = new THREE.Mesh(new THREE.SphereGeometry(0.8, 8, 8), new THREE.MeshBasicMaterial({ color: 0xFFFF00, transparent: true, opacity: 0.8 }));
+            flash.position.copy(position); scene.add(flash);
             const particles = [];
             for (let i = 0; i < 6; i++) {
-                const p = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.15, 0.15, 0.15),
-                    new THREE.MeshBasicMaterial({ color: 0xFF8800, transparent: true, opacity: 1 })
-                );
+                const p = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), new THREE.MeshBasicMaterial({ color: 0xFF8800, transparent: true, opacity: 1 }));
                 p.position.copy(position);
-                p.userData.vel = new THREE.Vector3(
-                    (Math.random() - 0.5) * 4,
-                    Math.random() * 3 + 1,
-                    (Math.random() - 0.5) * 4
-                );
-                scene.add(p);
-                particles.push(p);
+                p.userData.vel = new THREE.Vector3((Math.random() - 0.5) * 4, Math.random() * 3 + 1, (Math.random() - 0.5) * 4);
+                scene.add(p); particles.push(p);
             }
-
             const startTime = Date.now();
             function animParticles() {
                 const t = (Date.now() - startTime) / 500;
-                if (t >= 1) {
-                    scene.remove(flash);
-                    particles.forEach(p => scene.remove(p));
-                    return;
-                }
+                if (t >= 1) { scene.remove(flash); particles.forEach(p => scene.remove(p)); return; }
                 flash.scale.set(1 + t * 2, 1 + t * 2, 1 + t * 2);
                 flash.material.opacity = 0.8 * (1 - t);
                 particles.forEach(p => {
                     p.position.add(p.userData.vel.clone().multiplyScalar(0.016));
                     p.userData.vel.y -= 9.8 * 0.016;
-                    p.material.opacity = 1 - t;
-                    p.scale.setScalar(1 - t * 0.5);
+                    p.material.opacity = 1 - t; p.scale.setScalar(1 - t * 0.5);
                 });
                 requestAnimationFrame(animParticles);
             }
             animParticles();
         }
 
-        // ============ 擊殺熊（倒下後） ============
+        // ============ 擊殺熊 ============
         function killBear(bear) {
             bear.userData.dying = true;
             bear.userData.deathStartTime = Date.now();
@@ -562,8 +756,7 @@
             bone.rotation.z = Math.PI / 2; bone.position.set(-0.1, 0.35, 0); mg.add(bone);
 
             mg.position.copy(position); mg.position.y = 0.5;
-            mg.scale.set(0, 0, 0);
-            scene.add(mg);
+            mg.scale.set(0, 0, 0); scene.add(mg);
 
             const md = { mesh: mg, spawnTime: Date.now(), collected: false, startPos: mg.position.clone(), flyStart: null };
             meatDrops.push(md);
@@ -574,15 +767,20 @@
         function updatePlayer(dt) {
             const now = Date.now();
             const moveDir = new THREE.Vector3();
-
-            // 只有不在攻擊動畫中才允許移動
             const canMove = !isAttacking;
 
             if (canMove) {
+                // 鍵盤輸入
                 if (keys['w'] || keys['arrowup']) moveDir.z -= 1;
                 if (keys['s'] || keys['arrowdown']) moveDir.z += 1;
                 if (keys['a'] || keys['arrowleft']) moveDir.x -= 1;
                 if (keys['d'] || keys['arrowright']) moveDir.x += 1;
+
+                // 虛擬搖桿輸入
+                if (isJoystickActive && (Math.abs(joystickInput.x) > 0.1 || Math.abs(joystickInput.y) > 0.1)) {
+                    moveDir.x += joystickInput.x;
+                    moveDir.z += joystickInput.y; // 注意：搖桿 Y 軸方向
+                }
             }
 
             if (moveDir.length() > 0) {
@@ -605,7 +803,6 @@
                 player.position.x = Math.max(-limit, Math.min(limit, player.position.x));
                 player.position.z = Math.max(-limit, Math.min(limit, player.position.z));
 
-                // 角色朝向移動方向
                 if (!isAttacking) {
                     const targetAngle = Math.atan2(worldMove.x, worldMove.z);
                     let current = player.rotation.y;
@@ -615,7 +812,6 @@
                     player.rotation.y += diff * 0.15;
                 }
 
-                // 行走動畫
                 player.userData.walking = true;
                 player.userData.walkPhase = (player.userData.walkPhase || 0) + dt * 10;
                 const phase = player.userData.walkPhase;
@@ -644,34 +840,26 @@
                 const attackElapsed = now - player.userData.attackStartTime;
                 const attackDuration = player.userData.attackDuration;
                 const attackProgress = Math.min(attackElapsed / attackDuration, 1);
-
                 const parts = player.userData.parts;
 
-                // 斧頭揮砍動畫
                 if (attackProgress < 0.3) {
-                    // 準備階段 - 擧起斧頭
                     const t = attackProgress / 0.3;
                     parts.axeGroup.rotation.z = -t * 0.8;
                     parts.armR.rotation.x = -t * 0.6;
                 } else if (attackProgress < 0.6) {
-                    // 揮下階段 - 猛力揮下
                     const t = (attackProgress - 0.3) / 0.3;
                     parts.axeGroup.rotation.z = -0.8 + t * 2.0;
                     parts.armR.rotation.x = -0.6 + t * 1.2;
-
-                    // 在揮砍中途命中
                     if (t > 0.3 && !player.userData.hitDealt && player.userData.attackTarget) {
                         player.userData.hitDealt = true;
                         onAttackHit(player.userData.attackTarget);
                     }
                 } else {
-                    // 恢復階段
                     const t = (attackProgress - 0.6) / 0.4;
                     parts.axeGroup.rotation.z = 1.2 * (1 - t);
                     parts.armR.rotation.x = 0.6 * (1 - t);
                 }
 
-                // 攻擊結束
                 if (attackProgress >= 1) {
                     isAttacking = false;
                     player.userData.attacking = false;
@@ -682,22 +870,33 @@
                 }
             }
 
-            // 自動攻擊檢查
+            // 自動攻擊
             tryAutoAttack();
 
-            // 冷卻條更新
+            // UI 更新
             updateCooldownUI(now);
-
-            // 攻擊範圍指示
             updateAttackRangeUI();
 
             // 攝影機更新
+            updateCamera();
+        }
+
+        // ============ 攝影機更新 ============
+        function updateCamera() {
+            const camDist = CAMERA_DISTANCE;
+            const camH = CAMERA_HEIGHT;
+
+            // 用 cameraAngle 和 cameraPitch 計算攝影機位置
+            const offsetX = Math.sin(cameraAngle) * camDist * Math.cos(cameraPitch);
+            const offsetZ = Math.cos(cameraAngle) * camDist * Math.cos(cameraPitch);
+            const offsetY = camH * Math.sin(cameraPitch) + 5;
+
             const camTargetPos = new THREE.Vector3(
-                player.position.x,
-                player.position.y + CAMERA_HEIGHT,
-                player.position.z + CAMERA_DISTANCE
+                player.position.x + offsetX,
+                player.position.y + offsetY,
+                player.position.z + offsetZ
             );
-            camera.position.lerp(camTargetPos, 0.08);
+            camera.position.lerp(camTargetPos, 0.1);
             camera.lookAt(player.position.x, player.position.y + 1.5, player.position.z);
         }
 
@@ -720,16 +919,10 @@
             let hasTarget = false;
             for (const b of bears) {
                 if (b.userData.dying || b.userData.beingHit) continue;
-                if (player.position.distanceTo(b.position) <= ATTACK_RANGE) {
-                    hasTarget = true;
-                    break;
-                }
+                if (player.position.distanceTo(b.position) <= ATTACK_RANGE) { hasTarget = true; break; }
             }
-            if (hasTarget && !isAttacking) {
-                indicator.classList.add('active');
-            } else {
-                indicator.classList.remove('active');
-            }
+            if (hasTarget && !isAttacking) indicator.classList.add('active');
+            else indicator.classList.remove('active');
         }
 
         // ============ 視窗大小 ============
@@ -753,29 +946,20 @@
             for (let i = bears.length - 1; i >= 0; i--) {
                 const bear = bears[i];
 
-                // 出生動畫
                 if (bear.userData.spawning) {
                     const t = (now - bear.userData.spawnTime) / 500;
                     if (t >= 1) { bear.scale.set(1, 1, 1); bear.userData.spawning = false; }
                     else { const s = easeOutBack(t); bear.scale.set(s, s, s); }
                 }
 
-                // 被攻擊 - 倒下動畫
                 if (bear.userData.beingHit && !bear.userData.dying) {
                     const t = (now - bear.userData.hitStartTime) / bear.userData.hitDuration;
-                    if (t >= 1) {
-                        // 倒下完成，進入死亡
-                        killBear(bear);
-                        continue;
-                    }
-                    // 熊往後倒 + 縮小 + 變紅
+                    if (t >= 1) { killBear(bear); continue; }
                     const easeT = easeInQuad(t);
-                    bear.rotation.x = easeT * (Math.PI / 2); // 往後倒 90 度
-                    bear.position.y = -easeT * 0.5; // 往下沉
+                    bear.rotation.x = easeT * (Math.PI / 2);
+                    bear.position.y = -easeT * 0.5;
                     const s = 1 - easeT * 0.3;
                     bear.scale.set(s, s, s);
-
-                    // 變紅效果
                     bear.traverse(child => {
                         if (child.isMesh && child.material && !child.userData.colorSet) {
                             child.userData.originalColor = child.material.color.clone();
@@ -788,7 +972,6 @@
                     continue;
                 }
 
-                // 死亡動畫（飄走消失）
                 if (bear.userData.dying) {
                     const t = (now - bear.userData.deathStartTime) / 400;
                     if (t >= 1) { scene.remove(bear); }
@@ -801,11 +984,9 @@
                     continue;
                 }
 
-                // 閒置呼吸
                 bear.userData.bobPhase += 0.02;
                 bear.position.y = Math.sin(bear.userData.bobPhase) * 0.05;
 
-                // 被靠近時逃跑
                 const distToPlayer = player.position.distanceTo(bear.position);
                 if (distToPlayer < 8 && distToPlayer > 2) {
                     const awayDir = new THREE.Vector3().subVectors(bear.position, player.position).normalize();
@@ -858,6 +1039,11 @@
         function easeOutBack(t) { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
         function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
         function easeInQuad(t) { return t * t; }
+
+        // 防止手機所有預設手勢
+        document.addEventListener('gesturestart', e => e.preventDefault());
+        document.addEventListener('gesturechange', e => e.preventDefault());
+        document.addEventListener('gestureend', e => e.preventDefault());
 
         init();
     </script>
