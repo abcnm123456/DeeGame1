@@ -158,9 +158,23 @@
         }
 
         /* 手機模式樣式 */
-        @media (max-width: 768px), (hover: none) and (pointer: coarse) {
-            #joystickArea { display: block; }
-            #attackBtn { display: flex; }
+        @media (max-width: 768px) {
+            #joystickArea { display: block !important; }
+            #attackBtn { display: flex !important; }
+            #controls { display: none; }
+            #cooldownBar { bottom: 130px; }
+            #attackRange { bottom: 160px; }
+            #scoreBoard { top: 8px; left: 8px; padding: 6px 10px; }
+            #scoreBoard h2 { font-size: 9px; }
+            #scoreBoard .score { font-size: 18px; }
+            #ui { top: 8px; right: 8px; padding: 6px 10px; gap: 6px; }
+            #backpack { width: 32px; height: 32px; font-size: 16px; }
+            #meatCount { font-size: 18px; }
+            #meatIcon { font-size: 14px; }
+        }
+        @media (hover: none) and (pointer: coarse) {
+            #joystickArea { display: block !important; }
+            #attackBtn { display: flex !important; }
             #controls { display: none; }
             #cooldownBar { bottom: 130px; }
             #attackRange { bottom: 160px; }
@@ -307,36 +321,54 @@
             const joystickThumb = document.getElementById('joystickThumb');
             const attackBtn = document.getElementById('attackBtn');
 
-            const JOYSTICK_RADIUS = 40; // 搖桿最大移動半徑（像素）
+            const JOYSTICK_RADIUS = 40;
             let joystickCenter = { x: 0, y: 0 };
 
-            // ---- 虛擬搖桿 ----
-            joystickArea.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const touch = e.changedTouches[0];
-                joystickTouchId = touch.identifier;
-                isJoystickActive = true;
+            // 使用 document 級別的 touchstart 來捕獲所有觸控
+            document.addEventListener('touchstart', (e) => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const touch = e.changedTouches[i];
+                    const el = document.elementFromPoint(touch.clientX, touch.clientY);
 
-                const rect = joystickArea.getBoundingClientRect();
-                joystickCenter = {
-                    x: rect.left + rect.width / 2,
-                    y: rect.top + rect.height / 2
-                };
-                updateJoystick(touch.clientX, touch.clientY);
+                    // 檢查是否觸控在搖桿區域
+                    if (el && (el === joystickArea || el === joystickBase || el === joystickThumb || el === document.getElementById('joystickLabel') || joystickArea.contains(el))) {
+                        e.preventDefault();
+                        joystickTouchId = touch.identifier;
+                        isJoystickActive = true;
+
+                        const rect = joystickArea.getBoundingClientRect();
+                        joystickCenter = {
+                            x: rect.left + rect.width / 2,
+                            y: rect.top + rect.height / 2
+                        };
+                        updateJoystick(touch.clientX, touch.clientY);
+                        continue;
+                    }
+
+                    // 檢查是否觸控在攻擊按鈕
+                    if (el && (el === attackBtn || attackBtn.contains(el))) {
+                        e.preventDefault();
+                        tryManualAttack();
+                        continue;
+                    }
+
+                    // 右半螢幕 → 攝影機旋轉
+                    if (touch.clientX > window.innerWidth / 2 && cameraTouchId === null) {
+                        cameraTouchId = touch.identifier;
+                        lastCameraTouchX = touch.clientX;
+                        lastCameraTouchY = touch.clientY;
+                    }
+                }
             }, { passive: false });
 
-            window.addEventListener('touchmove', (e) => {
-                // 虛擬搖桿移動
+            document.addEventListener('touchmove', (e) => {
                 for (let i = 0; i < e.touches.length; i++) {
+                    // 虛擬搖桿移動
                     if (e.touches[i].identifier === joystickTouchId) {
                         e.preventDefault();
                         updateJoystick(e.touches[i].clientX, e.touches[i].clientY);
-                        break;
                     }
-                }
-                // 攝影機旋轉
-                for (let i = 0; i < e.touches.length; i++) {
+                    // 攝影機旋轉
                     if (e.touches[i].identifier === cameraTouchId) {
                         e.preventDefault();
                         const dx = e.touches[i].clientX - lastCameraTouchX;
@@ -345,12 +377,11 @@
                         cameraPitch = Math.max(0.3, Math.min(1.2, cameraPitch + dy * 0.005));
                         lastCameraTouchX = e.touches[i].clientX;
                         lastCameraTouchY = e.touches[i].clientY;
-                        break;
                     }
                 }
             }, { passive: false });
 
-            window.addEventListener('touchend', (e) => {
+            document.addEventListener('touchend', (e) => {
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const touch = e.changedTouches[i];
                     if (touch.identifier === joystickTouchId) {
@@ -366,13 +397,20 @@
                 }
             }, { passive: false });
 
-            window.addEventListener('touchcancel', (e) => {
-                joystickTouchId = null;
-                cameraTouchId = null;
-                isJoystickActive = false;
-                joystickInput.x = 0;
-                joystickInput.y = 0;
-                joystickThumb.style.transform = 'translate(-50%, -50%)';
+            document.addEventListener('touchcancel', (e) => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const touch = e.changedTouches[i];
+                    if (touch.identifier === joystickTouchId) {
+                        joystickTouchId = null;
+                        isJoystickActive = false;
+                        joystickInput.x = 0;
+                        joystickInput.y = 0;
+                        joystickThumb.style.transform = 'translate(-50%, -50%)';
+                    }
+                    if (touch.identifier === cameraTouchId) {
+                        cameraTouchId = null;
+                    }
+                }
             }, { passive: false });
 
             function updateJoystick(touchX, touchY) {
@@ -387,33 +425,11 @@
 
                 joystickThumb.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
 
-                // 正規化到 -1 ~ 1
                 joystickInput.x = dx / JOYSTICK_RADIUS;
                 joystickInput.y = dy / JOYSTICK_RADIUS;
             }
 
-            // ---- 攝影機旋轉（右半螢幕觸控） ----
-            renderer.domElement.addEventListener('touchstart', (e) => {
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    const touch = e.changedTouches[i];
-                    // 右半螢幕開始觸控 → 旋轉攝影機
-                    if (touch.clientX > window.innerWidth / 2) {
-                        if (cameraTouchId === null) {
-                            cameraTouchId = touch.identifier;
-                            lastCameraTouchX = touch.clientX;
-                            lastCameraTouchY = touch.clientY;
-                        }
-                    }
-                }
-            }, { passive: true });
-
-            // ---- 攻擊按鈕 ----
-            attackBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                // 手動觸發攻擊
-                tryManualAttack();
-            }, { passive: false });
+            const joystickBase = document.getElementById('joystickBase');
         }
 
         // ============ 手動攻擊（按鈕觸發） ============
