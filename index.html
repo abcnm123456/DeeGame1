@@ -2,833 +2,1435 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🐾 獵熊行動</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>獵熊行動 - Bear Hunt</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{overflow:hidden;background:#1a1a2e;font-family:'Segoe UI',sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
-canvas{display:block;touch-action:none}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { overflow: hidden; background: #1a1a2e; font-family: 'Microsoft JhengHei', sans-serif; }
+#gameCanvas { display: block; width: 100vw; height: 100vh; }
 
 /* HUD */
-.hud{position:fixed;z-index:100;pointer-events:none}
-#score{top:15px;left:15px;background:rgba(0,0,0,.65);padding:10px 18px;border-radius:14px;color:#fff;border:1px solid rgba(255,255,255,.1)}
-#score b{color:#FFD700;font-size:24px}
-#meatHud{top:15px;right:15px;background:rgba(0,0,0,.65);padding:10px 18px;border-radius:14px;color:#fff;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px}
-#meatHud b{color:#FF6B6B;font-size:24px}
-#hpBar{bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);padding:8px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.1);text-align:center;color:#fff}
-#hpFill{width:160px;height:8px;background:#333;border-radius:4px;margin:4px auto 0;overflow:hidden}
-#hpFill div{height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);transition:width .3s;border-radius:4px}
-#tip{bottom:55px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:12px;text-align:center}
-#tip b{color:#FFD700}
-.dmgFloat{position:fixed;pointer-events:none;z-index:200;font-size:20px;font-weight:bold;text-shadow:0 0 8px rgba(0,0,0,.8);animation:df .7s forwards}
-@keyframes df{0%{opacity:1;transform:translateY(0) scale(.5)}100%{opacity:0;transform:translateY(-40px) scale(1.1)}}
+#hud {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 15px 20px; pointer-events: none; z-index: 10;
+}
+#resources {
+  background: rgba(0,0,0,0.7); border-radius: 12px; padding: 12px 18px;
+  display: flex; gap: 20px; backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.res-item {
+  display: flex; align-items: center; gap: 6px; color: #fff; font-size: 14px; font-weight: bold;
+}
+.res-icon { font-size: 20px; }
+.res-val { color: #ffd700; }
 
-/* 升級面板 */
-#upPanel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;background:rgba(10,10,30,.92);backdrop-filter:blur(12px);padding:30px;border-radius:20px;border:2px solid #FFD700;display:none;text-align:center;color:#fff;min-width:260px}
-#upPanel h2{color:#FFD700;margin-bottom:12px;font-size:22px}
-#upPanel .row{display:flex;justify-content:space-between;margin:8px 0;font-size:14px;color:#ccc}
-#upPanel .row b{color:#FFD700}
-#upPanel .cost{margin-top:12px;color:#aaa}
-#upPanel .cost b{color:#FF6B6B;font-size:18px}
-#upBtn{margin-top:16px;padding:12px 36px;border:none;border-radius:12px;background:linear-gradient(135deg,#FFD700,#FFA500);color:#1a1a2e;font-size:16px;font-weight:bold;cursor:pointer;pointer-events:auto}
-#upBtn:disabled{background:#555;color:#999}
-#upClose{position:absolute;top:10px;right:14px;background:none;border:none;color:#666;font-size:20px;cursor:pointer;pointer-events:auto}
+#stats {
+  background: rgba(0,0,0,0.7); border-radius: 12px; padding: 12px 18px;
+  color: #fff; backdrop-filter: blur(10px); text-align: right;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.stat-line { font-size: 13px; margin: 2px 0; }
+.stat-line span { color: #ffd700; }
 
-/* 遊戲結束 */
-#goScreen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:300;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center}
-#goScreen h1{color:#ef4444;font-size:42px;margin-bottom:8px}
-#goScreen .sub{color:#ccc;font-size:16px}
-#goScreen .final{font-size:48px;color:#FFD700;font-weight:bold;margin:20px 0}
-#goScreen button{padding:14px 48px;border:none;border-radius:14px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;font-size:18px;font-weight:bold;cursor:pointer;pointer-events:auto}
+/* Bottom bar */
+#bottomBar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; justify-content: center; align-items: flex-end;
+  padding: 15px; pointer-events: none; z-index: 10; gap: 10px;
+}
+.action-btn {
+  pointer-events: all; background: rgba(0,0,0,0.8); border: 2px solid rgba(255,215,0,0.5);
+  color: #fff; padding: 10px 16px; border-radius: 10px; cursor: pointer;
+  font-size: 13px; font-weight: bold; transition: all 0.3s; font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.action-btn:hover { background: rgba(255,215,0,0.3); border-color: #ffd700; transform: translateY(-3px); }
+.action-btn:active { transform: scale(0.95); }
+.action-btn .key { font-size: 10px; color: #ffd700; background: rgba(255,215,0,0.2); padding: 2px 6px; border-radius: 4px; }
 
-/* 升級特效 */
-.upgFx{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);z-index:250;pointer-events:none;color:#FFD700;font-size:40px;font-weight:bold;text-shadow:0 0 30px #FFD700;animation:uf 1.8s forwards}
-@keyframes uf{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}50%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-100%) scale(.8)}}
+/* Health bar */
+#healthBar {
+  position: fixed; top: 80px; left: 20px; z-index: 10;
+  width: 200px; background: rgba(0,0,0,0.7); border-radius: 8px; padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+#healthBar .label { color: #fff; font-size: 11px; margin-bottom: 4px; }
+#healthBar .bar { height: 8px; background: #333; border-radius: 4px; overflow: hidden; }
+#healthBar .bar-fill { height: 100%; background: linear-gradient(90deg, #ff4444, #ff8844); transition: width 0.3s; border-radius: 4px; }
+#healthVal { color: #ff8844; font-size: 12px; margin-top: 2px; }
 
-/* 手機控件 */
-#joyArea{position:fixed;bottom:25px;left:25px;width:130px;height:130px;z-index:150;display:none}
-#joyBase{position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);top:50%;left:50%;transform:translate(-50%,-50%)}
-#joyThumb{position:absolute;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.3);border:2px solid rgba(255,255,255,.4);top:50%;left:50%;transform:translate(-50%,-50%)}
-#joyLabel{position:absolute;top:-12px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.3);font-size:10px}
-@media(hover:none)and(pointer:coarse),(max-width:768px){#joyArea{display:block}#tip{display:none}}
+/* Base info */
+#baseInfo {
+  position: fixed; top: 140px; left: 20px; z-index: 10;
+  width: 200px; background: rgba(0,0,0,0.7); border-radius: 8px; padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,0.1); display: none;
+}
+#baseInfo .title { color: #ffd700; font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+#baseInfo .upgrade-bar { height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin: 3px 0; }
+#baseInfo .upgrade-fill { height: 100%; background: linear-gradient(90deg, #44aaff, #88ddff); transition: width 0.3s; }
+
+/* Inventory */
+#inventory {
+  position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10;
+  background: rgba(0,0,0,0.8); border-radius: 12px; padding: 12px;
+  border: 1px solid rgba(255,255,255,0.1); display: none;
+  width: 180px; backdrop-filter: blur(10px);
+}
+#inventory .title { color: #ffd700; font-size: 13px; font-weight: bold; margin-bottom: 8px; text-align: center; }
+#invSlots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.inv-slot {
+  width: 50px; height: 50px; background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 22px; position: relative;
+}
+.inv-slot .qty { position: absolute; bottom: 2px; right: 4px; font-size: 10px; color: #ffd700; font-weight: bold; }
+
+/* Upgrade panel */
+#upgradePanel {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 20; background: rgba(0,0,0,0.92); border-radius: 16px;
+  padding: 24px; border: 2px solid #ffd700; display: none;
+  min-width: 350px; backdrop-filter: blur(15px);
+}
+#upgradePanel .title { color: #ffd700; font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 16px; }
+.upgrade-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; margin: 6px 0; background: rgba(255,255,255,0.05);
+  border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+}
+.upgrade-item .info { flex: 1; }
+.upgrade-item .name { color: #fff; font-size: 14px; font-weight: bold; }
+.upgrade-item .desc { color: #aaa; font-size: 11px; margin-top: 2px; }
+.upgrade-item .cost { color: #ffd700; font-size: 11px; margin-top: 4px; }
+.upgrade-btn {
+  background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000;
+  border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;
+  font-weight: bold; font-size: 12px; transition: all 0.2s; font-family: inherit;
+}
+.upgrade-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,215,0,0.5); }
+.upgrade-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.upgrade-btn .next-lv { font-size: 10px; display: block; }
+
+/* Notification */
+.notification {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.85); color: #ffd700; padding: 15px 30px;
+  border-radius: 12px; font-size: 18px; font-weight: bold; z-index: 30;
+  border: 2px solid #ffd700; animation: notifAnim 2s forwards;
+  pointer-events: none; text-align: center;
+}
+@keyframes notifAnim {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  30% { transform: translate(-50%, -50%) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -60%); }
+}
+
+/* Damage numbers */
+.dmg-num {
+  position: fixed; z-index: 15; font-weight: bold; font-size: 20px;
+  pointer-events: none; animation: floatUp 1s forwards;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+@keyframes floatUp {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.5); }
+}
+
+/* Minimap */
+#minimap {
+  position: fixed; bottom: 80px; right: 20px; z-index: 10;
+  width: 150px; height: 150px; background: rgba(0,0,0,0.7);
+  border-radius: 50%; border: 2px solid rgba(255,255,255,0.3);
+  overflow: hidden;
+}
+#minimapCanvas { width: 100%; height: 100%; border-radius: 50%; }
+
+/* Start screen */
+#startScreen {
+  position: fixed; inset: 0; z-index: 100;
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a0a0a 50%, #0a1a0a 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+#startScreen h1 { color: #ffd700; font-size: 48px; text-shadow: 0 0 30px rgba(255,215,0,0.5); margin-bottom: 10px; }
+#startScreen .sub { color: #aaa; font-size: 16px; margin-bottom: 40px; }
+#startScreen .bear-art { font-size: 80px; margin-bottom: 20px; }
+#startBtn {
+  background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000;
+  border: none; padding: 16px 48px; border-radius: 12px; cursor: pointer;
+  font-size: 20px; font-weight: bold; transition: all 0.3s; font-family: inherit;
+}
+#startBtn:hover { transform: scale(1.08); box-shadow: 0 0 30px rgba(255,215,0,0.5); }
+#startScreen .controls { color: #888; font-size: 13px; margin-top: 30px; text-align: center; line-height: 2; }
+
+/* Wave info */
+#waveInfo {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 25; color: #ff4444; font-size: 36px; font-weight: bold;
+  text-shadow: 0 0 20px rgba(255,0,0,0.5); pointer-events: none;
+  animation: waveAnim 3s forwards; display: none;
+}
+@keyframes waveAnim {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  30% { transform: translate(-50%, -50%) scale(1); }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
 </style>
 </head>
 <body>
 
-<div class="hud" id="score">獵殺 <b id="kCount">0</b></div>
-<div class="hud" id="meatHud">🥩 <b id="mCount">0</b></div>
-<div class="hud" id="hpBar"><span id="hpText">HP 100/100</span><div id="hpFill"><div id="hpInner" style="width:100%"></div></div></div>
-<div class="hud" id="tip"><b>WASD</b> 移動 | 走到熊旁自動攻擊 | <b>E</b> 升級基地</div>
-<div id="upPanel"><button id="upClose" onclick="closeUp()">✕</button><h2>⚒️ 升級基地</h2><div class="row"><span>武器等級</span><b id="uLv">Lv.1</b></div><div class="row"><span>攻擊力</span><b id="uAtk">15</b></div><div class="row"><span>攻擊範圍</span><b id="uRange">2.0</b></div><div class="row"><span>最大HP</span><b id="uMHP">100</b></div><div class="cost">花費 <b id="uCost">5</b> 🥩</div><button id="upBtn" onclick="doUp()">升級</button></div>
-<div id="goScreen"><h1>💀 獵熊失敗</h1><div class="sub">你被熊擊敗了</div><div class="final" id="goScore">0 🥩</div><button onclick="restart()">重新開始</button></div>
-<div id="joyArea"><div id="joyLabel">移動</div><div id="joyBase"></div><div id="joyThumb"></div></div>
+<!-- Start Screen -->
+<div id="startScreen">
+  <div class="bear-art">🐻</div>
+  <h1>獵熊行動</h1>
+  <div class="sub">Bear Hunt — 收集資源・堆疊物品・升級基地</div>
+  <button id="startBtn" onclick="startGame()">開始遊戲</button>
+  <div class="controls">
+    WASD / 方向鍵 — 移動　｜　滑鼠 — 轉向<br>
+    點擊 / 空白鍵 — 攻擊　｜　E — 拾取<br>
+    B — 建造基地　｜　U — 升級面板　｜　I — 背包<br>
+    R — 回基地回血　｜　數字鍵 1-5 — 切換武器
+  </div>
+</div>
 
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js"}}</script>
-<script type="module">
-import * as THREE from 'three';
+<!-- HUD -->
+<div id="hud" style="display:none;">
+  <div id="resources">
+    <div class="res-item"><span class="res-icon">🪵</span> <span class="res-val" id="resWood">0</span></div>
+    <div class="res-item"><span class="res-icon">🪨</span> <span class="res-val" id="resStone">0</span></div>
+    <div class="res-item"><span class="res-icon">🍖</span> <span class="res-val" id="resFood">0</span></div>
+    <div class="res-item"><span class="res-icon">💰</span> <span class="res-val" id="resGold">0</span></div>
+  </div>
+  <div id="stats">
+    <div class="stat-line">🎯 分數: <span id="scoreVal">0</span></div>
+    <div class="stat-line">🐻 擊殺: <span id="killVal">0</span></div>
+    <div class="stat-line">🌊 波數: <span id="waveVal">1</span></div>
+    <div class="stat-line">⚔️ 攻擊力: <span id="atkVal">10</span></div>
+    <div class="stat-line">🛡️ 防禦力: <span id="defVal">0</span></div>
+  </div>
+</div>
 
-/* ======== 全域變數 ======== */
-let scene, cam, ren;
-let bears = [], meats = [];
-let player, keys = {};
+<div id="healthBar" style="display:none;">
+  <div class="label">❤️ 生命值</div>
+  <div class="bar"><div class="bar-fill" id="hpFill" style="width:100%"></div></div>
+  <div id="healthVal">100 / 100</div>
+</div>
 
-// 參數
-const MAP = 60, SPEED = 12;
-const CAM_H = 15, CAM_D = 18, CAM_PITCH = 0.7;
-let atkRange = 2, atkCD = 1000, lastAtk = 0, attacking = false;
-let camAngle = 0;
+<div id="baseInfo">
+  <div class="title">🏠 基地 Lv.<span id="baseLvVal">1</span></div>
+  <div class="upgrade-bar"><div class="upgrade-fill" id="baseHpFill" style="width:100%"></div></div>
+  <div style="color:#aaa;font-size:11px;" id="baseHpText">100/100</div>
+  <div style="color:#888;font-size:10px;margin-top:4px;">靠近基地按 R 回血</div>
+</div>
 
-// 觸控
-let joyIn = {x:0, y:0}, joyActive = false, joyId = null, camId = null, lastTX = 0, lastTY = 0;
+<!-- Bottom Action Bar -->
+<div id="bottomBar" style="display:none;">
+  <button class="action-btn" onclick="toggleInventory()">🎒 背包<span class="key">I</span></button>
+  <button class="action-btn" onclick="toggleUpgrade()">⬆️ 升級<span class="key">U</span></button>
+  <button class="action-btn" onclick="buildBase()">🏠 建造基地<span class="key">B</span></button>
+  <button class="action-btn" onclick="healAtBase()">❤️ 回基地回血<span class="key">R</span></button>
+</div>
 
-// 狀態
-let hp = 100, maxHP = 100, atk = 15;
-let uLv = 1, uCost = 5, meat = 0;
-let nearBase = false, dead = false;
+<!-- Inventory Panel -->
+<div id="inventory">
+  <div class="title">🎒 背包</div>
+  <div id="invSlots"></div>
+</div>
 
-/* ======== 初始化 ======== */
-(function boot(){
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87CEEB);
-    scene.fog = new THREE.FogExp2(0x87CEEB, 0.008);
+<!-- Upgrade Panel -->
+<div id="upgradePanel">
+  <div class="title">⬆️ 升級面板</div>
+  <div id="upgradeList"></div>
+  <div style="text-align:center;margin-top:12px;color:#888;font-size:11px;">按 U 或 ESC 關閉</div>
+</div>
 
-    cam = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 300);
-    ren = new THREE.WebGLRenderer({antialias:true});
-    ren.setSize(innerWidth, innerHeight);
-    ren.setPixelRatio(Math.min(devicePixelRatio, 2));
-    ren.shadowMap.enabled = true;
-    ren.toneMapping = THREE.ACESFilmicToneMapping;
-    document.body.appendChild(ren.domElement);
+<!-- Minimap -->
+<div id="minimap" style="display:none;">
+  <canvas id="minimapCanvas" width="150" height="150"></canvas>
+</div>
 
-    // 光源
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const sun = new THREE.DirectionalLight(0xfff4e0, 1.2);
-    sun.position.set(20, 35, 15); sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
-    const d = 45;
-    sun.shadow.camera.left = -d; sun.shadow.camera.right = d;
-    sun.shadow.camera.top = d; sun.shadow.camera.bottom = -d;
-    sun.shadow.camera.near = 0.5; sun.shadow.camera.far = 100;
-    scene.add(sun);
-    scene.add(new THREE.HemisphereLight(0x87CEEB, 0x4a7023, 0.35));
+<!-- Wave Info -->
+<div id="waveInfo"></div>
 
-    buildWorld();
-    player = buildPlayer();
-    player.position.set(0, 0, 5);
-    scene.add(player);
+<canvas id="gameCanvas"></canvas>
 
-    for (let i = 0; i < 8; i++) spawnBear();
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ==================== GAME STATE ====================
+const G = {
+  running: false, paused: false,
+  score: 0, kills: 0, wave: 1, waveTimer: 0,
+  playerHP: 100, playerMaxHP: 100, atk: 10, def: 0, atkSpeed: 0.3,
+  resources: { wood: 0, stone: 0, food: 0, gold: 0 },
+  inventory: [],
+  base: null, baseLv: 1, baseMaxHP: 100, baseHP: 100,
+  playerPos: { x: 0, z: 0 },
+  moveSpeed: 0.15,
+  canAttack: true, attackCooldown: 0,
+  nearestItem: null, nearestBear: null,
+  damageNumbers: [],
+  particles: [],
+};
 
-    // 事件
-    addEventListener('resize', () => {
-        cam.aspect = innerWidth / innerHeight;
-        cam.updateProjectionMatrix();
-        ren.setSize(innerWidth, innerHeight);
-    });
-    addEventListener('keydown', e => {
-        keys[e.key.toLowerCase()] = true;
-        if (e.key.toLowerCase() === 'e' && nearBase && !dead) toggleUp();
-    });
-    addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
-    ren.domElement.addEventListener('contextmenu', e => e.preventDefault());
-    setupJoy();
+const WEAPONS = [
+  { name: '拳头', icon: '👊', dmgMult: 1, range: 3 },
+  { name: '木棍', icon: '🪵', dmgMult: 1.5, range: 4 },
+  { name: '石斧', icon: '🪓', dmgMult: 2.5, range: 4.5, cost: { stone: 5, wood: 3 } },
+  { name: '铁剑', icon: '⚔️', dmgMult: 4, range: 5, cost: { stone: 10, gold: 5 } },
+  { name: '猎熊矛', icon: '🔱', dmgMult: 6, range: 5.5, cost: { stone: 15, gold: 10, wood: 10 } },
+];
+let currentWeapon = 0;
+let unlockedWeapons = [true, false, false, false, false];
 
-    loop();
-})();
+const UPGRADES = [
+  { id: 'hp', name: '❤️ 生命上限', desc: '增加最大生命值', baseCost: { wood: 5, stone: 3 }, costMult: 1.5, maxLv: 10, lv: 0, effect: () => { G.playerMaxHP += 20; G.playerHP += 20; } },
+  { id: 'atk', name: '⚔️ 攻擊力', desc: '增加基礎攻擊力', baseCost: { stone: 5, gold: 2 }, costMult: 1.6, maxLv: 10, lv: 0, effect: () => { G.atk += 5; } },
+  { id: 'def', name: '🛡️ 防禦力', desc: '減少受到的傷害', baseCost: { stone: 8, gold: 3 }, costMult: 1.8, maxLv: 8, lv: 0, effect: () => { G.def += 3; } },
+  { id: 'spd', name: '👟 移動速度', desc: '跑得更快', baseCost: { wood: 8, food: 5 }, costMult: 1.7, maxLv: 5, lv: 0, effect: () => { G.moveSpeed += 0.03; } },
+  { id: 'as', name: '⚡ 攻擊速度', desc: '攻擊更快速', baseCost: { gold: 5, stone: 5 }, costMult: 2, maxLv: 5, lv: 0, effect: () => { G.atkSpeed = Math.max(0.1, G.atkSpeed - 0.04); } },
+  { id: 'regen', name: '💚 生命回復', desc: '緩慢回復生命', baseCost: { food: 10, wood: 5 }, costMult: 2, maxLv: 5, lv: 0, effect: () => {} },
+];
+let regenTimer = 0;
 
-/* ======== 建立場景 ======== */
-function buildWorld() {
-    // 地面
-    const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(MAP, MAP, 40, 40),
-        new THREE.MeshLambertMaterial({color: 0x4a7023})
-    );
-    ground.rotation.x = -Math.PI / 2;
-    ground.receiveShadow = true;
-    scene.add(ground);
+// ==================== THREE.JS SETUP ====================
+let scene, camera, renderer, clock;
+let ground, skybox;
+const worldSize = 200;
 
-    // 草地色斑
-    const cols = [0x5a8a2a, 0x3d6018, 0x6a9a35, 0x528020];
-    for (let i = 0; i < 50; i++) {
-        const p = new THREE.Mesh(
-            new THREE.CircleGeometry(1 + Math.random() * 2, 8),
-            new THREE.MeshLambertMaterial({color: cols[i % 4]})
-        );
-        p.rotation.x = -Math.PI / 2;
-        p.position.set((Math.random() - 0.5) * MAP * 0.9, 0.01, (Math.random() - 0.5) * MAP * 0.9);
-        scene.add(p);
-    }
+// Player mesh
+let playerMesh, playerGroup;
+// Mobs
+let bears = [];
+let resources3D = [];
+let particles3D = [];
+let baseMesh = null;
 
-    // 樹木
-    const trees = [[-20,0,-18],[-22,0,8],[20,0,-14],[18,0,20],[-12,0,24],[22,0,5],[-24,0,-6],[10,0,-26],[-8,0,28],[26,0,-3],[-26,0,15],[0,0,-28],[14,0,26],[-18,0,-22],[24,0,18],[-28,0,0],[8,0,-28],[-28,0,-15]];
-    trees.forEach(p => {
-        const t = new THREE.Group();
-        t.add(makeMesh(new THREE.CylinderGeometry(0.25,0.4,3,8), 0x6B3A1F, [0,1.5,0], true));
-        [0x228B22, 0x2E8B2E, 0x1E7A1E].forEach((c, i) => {
-            const lf = new THREE.Mesh(new THREE.SphereGeometry(1.2 - i*0.2, 8, 8), new THREE.MeshLambertMaterial({color: c}));
-            lf.position.set([0,-0.5,0.4][i], [4,3.5,3.6][i], [0,0.3,-0.3][i]);
-            lf.castShadow = true; t.add(lf);
-        });
-        t.position.set(p[0], p[1], p[2]);
-        scene.add(t);
-    });
+function initThree() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87CEEB);
+  scene.fog = new THREE.Fog(0x87CEEB, 80, 180);
 
-    // 石頭
-    for (let i = 0; i < 15; i++) {
-        const a = Math.random() * Math.PI * 2, r = 8 + Math.random() * 20;
-        const rock = new THREE.Mesh(
-            new THREE.DodecahedronGeometry(0.3 + Math.random() * 0.5, 0),
-            new THREE.MeshLambertMaterial({color: new THREE.Color(0.4 + Math.random()*0.2, 0.4 + Math.random()*0.2, 0.38)})
-        );
-        rock.position.set(Math.cos(a) * r, 0.15, Math.sin(a) * r);
-        rock.castShadow = true; scene.add(rock);
-    }
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 300);
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas'), antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  clock = new THREE.Clock();
 
-    // 花朵
-    const fCols = [0xFF69B4, 0xFFD700, 0xFF6347, 0xDA70D6];
-    for (let i = 0; i < 40; i++) {
-        const f = new THREE.Group();
-        f.add(makeMesh(new THREE.CylinderGeometry(0.03,0.03,0.4,4), 0x228B22, [0,0.2,0]));
-        const pt = new THREE.Mesh(
-            new THREE.SphereGeometry(0.12, 6, 6),
-            new THREE.MeshLambertMaterial({color: fCols[i % 4]})
-        );
-        pt.position.y = 0.45; f.add(pt);
-        const a = Math.random() * Math.PI * 2, r = 5 + Math.random() * 24;
-        f.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
-        scene.add(f);
-    }
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0x6688aa, 0.6);
+  scene.add(ambientLight);
 
-    // 基地
-    buildBase();
+  const sunLight = new THREE.DirectionalLight(0xffeedd, 1.0);
+  sunLight.position.set(50, 80, 30);
+  sunLight.castShadow = true;
+  sunLight.shadow.mapSize.width = 2048;
+  sunLight.shadow.mapSize.height = 2048;
+  sunLight.shadow.camera.near = 0.5;
+  sunLight.shadow.camera.far = 200;
+  sunLight.shadow.camera.left = -100;
+  sunLight.shadow.camera.right = 100;
+  sunLight.shadow.camera.top = 100;
+  sunLight.shadow.camera.bottom = -100;
+  scene.add(sunLight);
+
+  // Ground
+  const groundGeo = new THREE.PlaneGeometry(worldSize * 2, worldSize * 2, 40, 40);
+  // Add some height variation
+  const posAttr = groundGeo.attributes.position;
+  for (let i = 0; i < posAttr.count; i++) {
+    const x = posAttr.getX(i);
+    const z = posAttr.getY(i);
+    posAttr.setZ(i, Math.sin(x * 0.05) * Math.cos(z * 0.05) * 2);
+  }
+  groundGeo.computeVertexNormals();
+  const groundMat = new THREE.MeshLambertMaterial({ color: 0x3a7d3a });
+  ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // Decorative elements
+  createEnvironment();
+
+  // Player
+  createPlayer();
 }
 
-/* ======== 基地 ======== */
+function createEnvironment() {
+  // Trees
+  for (let i = 0; i < 120; i++) {
+    const x = (Math.random() - 0.5) * worldSize * 1.6;
+    const z = (Math.random() - 0.5) * worldSize * 1.6;
+    if (Math.sqrt(x*x + z*z) < 15) continue; // Keep spawn area clear
+    createTree(x, z);
+  }
+
+  // Rocks
+  for (let i = 0; i < 60; i++) {
+    const x = (Math.random() - 0.5) * worldSize * 1.6;
+    const z = (Math.random() - 0.5) * worldSize * 1.6;
+    createRock(x, z);
+  }
+
+  // Berry bushes
+  for (let i = 0; i < 40; i++) {
+    const x = (Math.random() - 0.5) * worldSize * 1.4;
+    const z = (Math.random() - 0.5) * worldSize * 1.4;
+    createBush(x, z);
+  }
+}
+
+function createTree(x, z) {
+  const group = new THREE.Group();
+  // Trunk
+  const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 4, 6);
+  const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+  const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+  trunk.position.y = 2;
+  trunk.castShadow = true;
+  group.add(trunk);
+  // Leaves
+  const leafGeo = new THREE.SphereGeometry(2.5, 6, 6);
+  const leafMat = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+  const leaf = new THREE.Mesh(leafGeo, leafMat);
+  leaf.position.y = 5;
+  leaf.castShadow = true;
+  group.add(leaf);
+  group.position.set(x, 0, z);
+  group.userData = { type: 'tree', x, z };
+  scene.add(group);
+}
+
+function createRock(x, z) {
+  const geo = new THREE.DodecahedronGeometry(1 + Math.random() * 1.5, 0);
+  const mat = new THREE.MeshLambertMaterial({ color: 0x888888 });
+  const rock = new THREE.Mesh(geo, mat);
+  rock.position.set(x, 0.5, z);
+  rock.rotation.set(Math.random(), Math.random(), Math.random());
+  rock.castShadow = true;
+  rock.userData = { type: 'rock', x, z };
+  scene.add(rock);
+}
+
+function createBush(x, z) {
+  const group = new THREE.Group();
+  const geo = new THREE.SphereGeometry(1, 6, 6);
+  const mat = new THREE.MeshLambertMaterial({ color: 0x2d5a1e });
+  const bush = new THREE.Mesh(geo, mat);
+  bush.position.y = 0.5;
+  bush.scale.set(1, 0.6, 1);
+  group.add(bush);
+  // Berries
+  for (let i = 0; i < 5; i++) {
+    const berryGeo = new THREE.SphereGeometry(0.15, 4, 4);
+    const berryMat = new THREE.MeshLambertMaterial({ color: 0xff3333 });
+    const berry = new THREE.Mesh(berryGeo, berryMat);
+    const angle = (i / 5) * Math.PI * 2;
+    berry.position.set(Math.cos(angle) * 0.6, 0.8, Math.sin(angle) * 0.6);
+    group.add(berry);
+  }
+  group.position.set(x, 0, z);
+  group.userData = { type: 'bush', x, z, harvestable: true };
+  scene.add(group);
+}
+
+function createPlayer() {
+  playerGroup = new THREE.Group();
+
+  // Body
+  const bodyGeo = new THREE.CylinderGeometry(0.4, 0.4, 1.2, 8);
+  const bodyMat = new THREE.MeshLambertMaterial({ color: 0x4488ff });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.position.y = 1;
+  body.castShadow = true;
+  playerGroup.add(body);
+
+  // Head
+  const headGeo = new THREE.SphereGeometry(0.35, 8, 8);
+  const headMat = new THREE.MeshLambertMaterial({ color: 0xffcc99 });
+  const head = new THREE.Mesh(headGeo, headMat);
+  head.position.y = 1.8;
+  head.castShadow = true;
+  playerGroup.add(head);
+
+  // Weapon indicator
+  const weaponGeo = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 4);
+  const weaponMat = new THREE.MeshLambertMaterial({ color: 0xaa6633 });
+  const weapon = new THREE.Mesh(weaponGeo, weaponMat);
+  weapon.position.set(0.6, 1.2, 0);
+  weapon.rotation.z = -0.3;
+  playerGroup.add(weapon);
+
+  playerGroup.position.set(0, 0, 0);
+  playerMesh = playerGroup;
+  scene.add(playerMesh);
+}
+
+// ==================== BEAR SYSTEM ====================
+function createBear(x, z, isBoss) {
+  const group = new THREE.Group();
+  const scale = isBoss ? 1.8 : 1;
+
+  // Body
+  const bodyGeo = new THREE.SphereGeometry(0.8, 8, 8);
+  const bodyMat = new THREE.MeshLambertMaterial({ color: isBoss ? 0x8B0000 : 0x8B4513 });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.position.y = 1;
+  body.scale.set(1, 0.9, 1.3);
+  body.castShadow = true;
+  group.add(body);
+
+  // Head
+  const headGeo = new THREE.SphereGeometry(0.45, 8, 8);
+  const headMat = new THREE.MeshLambertMaterial({ color: isBoss ? 0xaa2222 : 0x995533 });
+  const head = new THREE.Mesh(headGeo, headMat);
+  head.position.set(0, 1.3, 0.7);
+  head.castShadow = true;
+  group.add(head);
+
+  // Eyes
+  [-0.15, 0.15].forEach(offset => {
+    const eyeGeo = new THREE.SphereGeometry(0.06, 4, 4);
+    const eyeMat = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+    const eye = new THREE.Mesh(eyeGeo, eyeMat);
+    eye.position.set(offset, 1.35, 1.1);
+    group.add(eye);
+  });
+
+  // Ears
+  [-0.3, 0.3].forEach(offset => {
+    const earGeo = new THREE.SphereGeometry(0.12, 4, 4);
+    const earMat = new THREE.MeshLambertMaterial({ color: isBoss ? 0xaa3333 : 0x774422 });
+    const ear = new THREE.Mesh(earGeo, earMat);
+    ear.position.set(offset, 1.65, 0.6);
+    group.add(ear);
+  });
+
+  // HP bar
+  const hpBarBg = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.2, 0.12),
+    new THREE.MeshBasicMaterial({ color: 0x333333 })
+  );
+  hpBarBg.position.set(0, 2.2, 0);
+  hpBarBg.lookAt(camera.position);
+  group.add(hpBarBg);
+
+  const hpBarFill = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.2, 0.1),
+    new THREE.MeshBasicMaterial({ color: isBoss ? 0xff0000 : 0xff4444 })
+  );
+  hpBarFill.position.set(0, 2.2, 0.01);
+  group.add(hpBarFill);
+
+  const hp = isBoss ? 80 + G.wave * 30 : 30 + G.wave * 10;
+  const dmg = isBoss ? 20 + G.wave * 5 : 8 + G.wave * 2;
+  const spd = isBoss ? 0.03 : 0.04 + Math.random() * 0.02;
+  const goldDrop = isBoss ? 5 + G.wave * 2 : 1 + Math.floor(G.wave / 2);
+
+  group.position.set(x, 0, z);
+  group.userData = {
+    type: 'bear', hp, maxHP: hp, dmg, speed: spd,
+    attackCD: 0, isBoss, goldDrop, scale,
+    alive: true, hpBarBg, hpBarFill,
+  };
+  group.scale.setScalar(scale);
+
+  scene.add(group);
+  bears.push(group);
+}
+
+function spawnWave() {
+  const count = 3 + G.wave * 2;
+  const isBossWave = G.wave % 5 === 0;
+
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 30 + Math.random() * 40;
+    const x = Math.cos(angle) * dist;
+    const z = Math.sin(angle) * dist;
+    createBear(x, z, false);
+  }
+
+  if (isBossWave) {
+    const angle = Math.random() * Math.PI * 2;
+    createBear(Math.cos(angle) * 50, Math.sin(angle) * 50, true);
+    showWaveInfo(`🐻 波 ${G.wave} — BOSS 來襲！`);
+  } else {
+    showWaveInfo(`🐻 波 ${G.wave} — 熊群來襲！`);
+  }
+}
+
+// ==================== RESOURCE DROPS ====================
+function createResourceDrop(x, z, type, amount) {
+  const group = new THREE.Group();
+  let color, icon;
+
+  switch(type) {
+    case 'wood': color = 0x8B4513; icon = '🪵'; break;
+    case 'stone': color = 0x888888; icon = '🪨'; break;
+    case 'food': color = 0xff6644; icon = '🍖'; break;
+    case 'gold': color = 0xffd700; icon = '💰'; break;
+  }
+
+  const geo = type === 'gold' ? new THREE.OctahedronGeometry(0.4) : new THREE.BoxGeometry(0.5, 0.5, 0.5);
+  const mat = new THREE.MeshLambertMaterial({ color });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.y = 0.8;
+  mesh.castShadow = true;
+  group.add(mesh);
+
+  group.position.set(x, 0, z);
+  group.userData = { type: 'resource', resType: type, amount, alive: true, bobPhase: Math.random() * Math.PI * 2 };
+  scene.add(group);
+  resources3D.push(group);
+}
+
+// ==================== BASE SYSTEM ====================
+function createBaseMesh() {
+  if (baseMesh) scene.remove(baseMesh);
+
+  const group = new THREE.Group();
+
+  // Foundation
+  const foundGeo = new THREE.BoxGeometry(6, 0.5, 6);
+  const foundMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
+  const found = new THREE.Mesh(foundGeo, foundMat);
+  found.position.y = 0.25;
+  found.receiveShadow = true;
+  group.add(found);
+
+  // Walls (based on level)
+  const wallCount = Math.min(G.baseLv + 3, 8);
+  for (let i = 0; i < wallCount; i++) {
+    const angle = (i / wallCount) * Math.PI * 2;
+    const wallGeo = new THREE.BoxGeometry(1.5, 2, 0.3);
+    const wallMat = new THREE.MeshLambertMaterial({ color: G.baseLv > 3 ? 0x886644 : 0xAA8855 });
+    const wall = new THREE.Mesh(wallGeo, wallMat);
+    wall.position.set(Math.cos(angle) * 3, 1.5, Math.sin(angle) * 3);
+    wall.rotation.y = angle + Math.PI / 2;
+    wall.castShadow = true;
+    group.add(wall);
+  }
+
+  // Center tower
+  const towerGeo = new THREE.CylinderGeometry(0.5, 0.8, 3 + G.baseLv * 0.5, 8);
+  const towerMat = new THREE.MeshLambertMaterial({ color: 0x4488ff });
+  const tower = new THREE.Mesh(towerGeo, towerMat);
+  tower.position.y = 2 + (3 + G.baseLv * 0.5) / 2;
+  tower.castShadow = true;
+  group.add(tower);
+
+  // Flag
+  const poleGeo = new THREE.CylinderGeometry(0.05, 0.05, 2, 4);
+  const poleMat = new THREE.MeshLambertMaterial({ color: 0xcccccc });
+  const pole = new THREE.Mesh(poleGeo, poleMat);
+  pole.position.y = 5 + G.baseLv * 0.5;
+  group.add(pole);
+
+  const flagGeo = new THREE.PlaneGeometry(1, 0.6);
+  const flagMat = new THREE.MeshLambertMaterial({ color: 0xff4444, side: THREE.DoubleSide });
+  const flag = new THREE.Mesh(flagGeo, flagMat);
+  flag.position.set(0.5, 5.5 + G.baseLv * 0.5, 0);
+  group.add(flag);
+
+  // Level text effect - torches
+  for (let i = 0; i < Math.min(G.baseLv, 5); i++) {
+    const angle = (i / 5) * Math.PI * 2;
+    const torchGeo = new THREE.ConeGeometry(0.15, 0.4, 4);
+    const torchMat = new THREE.MeshLambertMaterial({ color: 0xff8800, emissive: 0xff4400, emissiveIntensity: 0.5 });
+    const torch = new THREE.Mesh(torchGeo, torchMat);
+    torch.position.set(Math.cos(angle) * 2.8, 2.5, Math.sin(angle) * 2.8);
+    group.add(torch);
+  }
+
+  group.position.set(0, 0, -10);
+  baseMesh = group;
+  scene.add(baseMesh);
+
+  G.base = { x: 0, z: -10 };
+}
+
+// ==================== INPUT ====================
+const keys = {};
+let mouseX = 0, mouseY = 0;
+let cameraAngle = 0, cameraPitch = 0.6;
+let cameraDistance = 12;
+
+document.addEventListener('keydown', e => {
+  keys[e.key.toLowerCase()] = true;
+  if (e.key === ' ') { e.preventDefault(); attack(); }
+  if (e.key.toLowerCase() === 'e') pickUpNearest();
+  if (e.key.toLowerCase() === 'i') toggleInventory();
+  if (e.key.toLowerCase() === 'u') toggleUpgrade();
+  if (e.key.toLowerCase() === 'b') buildBase();
+  if (e.key.toLowerCase() === 'r') healAtBase();
+  if (e.key === 'Escape') closePanels();
+  if (e.key >= '1' && e.key <= '5') switchWeapon(parseInt(e.key) - 1);
+});
+document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+document.addEventListener('mousemove', e => {
+  if (!G.running || G.paused) return;
+  if (document.pointerLockElement) {
+    cameraAngle -= e.movementX * 0.003;
+    cameraPitch = Math.max(0.2, Math.min(1.2, cameraPitch + e.movementY * 0.003));
+  }
+});
+
+document.addEventListener('mousedown', e => {
+  if (!G.running) return;
+  if (e.button === 0) {
+    const canvas = document.getElementById('gameCanvas');
+    if (!document.pointerLockElement) {
+      canvas.requestPointerLock();
+    }
+    attack();
+  }
+  if (e.button === 2) pickUpNearest();
+});
+
+document.addEventListener('wheel', e => {
+  cameraDistance = Math.max(6, Math.min(25, cameraDistance + e.deltaY * 0.01));
+});
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ==================== GAME ACTIONS ====================
+function attack() {
+  if (!G.canAttack || G.paused) return;
+  G.canAttack = false;
+  G.attackCooldown = G.atkSpeed;
+
+  const weapon = WEAPONS[currentWeapon];
+  const dmg = Math.floor(G.atk * weapon.dmgMult);
+  const dir = new THREE.Vector3(-Math.sin(cameraAngle), 0, -Math.cos(cameraAngle));
+
+  // Attack animation - weapon swing
+  if (playerMesh.children[2]) {
+    const wp = playerMesh.children[2];
+    const origRot = wp.rotation.z;
+    wp.rotation.z = -1.5;
+    setTimeout(() => { wp.rotation.z = origRot; }, 150);
+  }
+
+  // Check hits
+  let hitAny = false;
+  bears.forEach(bear => {
+    if (!bear.userData.alive) return;
+    const dx = bear.position.x - playerMesh.position.x;
+    const dz = bear.position.z - playerMesh.position.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+
+    if (dist < weapon.range) {
+      const realDmg = Math.max(1, dmg - G.def * 0); // Bears don't use player def
+      bear.userData.hp -= realDmg;
+      hitAny = true;
+      showDamageNumber(bear.position, realDmg, '#ff4444');
+
+      // Knockback
+      const kb = 2;
+      bear.position.x += (dx / dist) * kb;
+      bear.position.z += (dz / dist) * kb;
+
+      if (bear.userData.hp <= 0) {
+        killBear(bear);
+      }
+    }
+  });
+
+  if (!hitAny) {
+    // Hit trees/rocks nearby
+    scene.children.forEach(child => {
+      if (!child.userData) return;
+      if (child.userData.type === 'tree' || child.userData.type === 'rock' || child.userData.type === 'bush') {
+        const dx = child.position.x - playerMesh.position.x;
+        const dz = child.position.z - playerMesh.position.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < weapon.range + 1) {
+          harvestNode(child);
+        }
+      }
+    });
+  }
+}
+
+function killBear(bear) {
+  bear.userData.alive = false;
+  G.kills++;
+  G.score += bear.userData.isBoss ? 500 : 100;
+
+  // Drop resources
+  const dropTypes = ['wood', 'stone', 'food', 'gold'];
+  const dropCount = bear.userData.isBoss ? 5 : 2 + Math.floor(Math.random() * 2);
+  for (let i = 0; i < dropCount; i++) {
+    const type = dropTypes[Math.floor(Math.random() * dropTypes.length)];
+    const amount = type === 'gold' ? bear.userData.goldDrop : 1 + Math.floor(Math.random() * 3);
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 1 + Math.random() * 2;
+    createResourceDrop(
+      bear.position.x + Math.cos(angle) * dist,
+      bear.position.z + Math.sin(angle) * dist,
+      type, amount
+    );
+  }
+
+  // Death particles
+  for (let i = 0; i < 15; i++) {
+    createParticle(bear.position.x, bear.position.y + 1, bear.position.z, bear.userData.isBoss ? 0xff0000 : 0x8B4513);
+  }
+
+  scene.remove(bear);
+
+  // Wave complete check
+  if (bears.filter(b => b.userData.alive).length === 0) {
+    setTimeout(() => {
+      G.wave++;
+      document.getElementById('waveVal').textContent = G.wave;
+      setTimeout(spawnWave, 2000);
+    }, 1500);
+  }
+}
+
+function harvestNode(node) {
+  if (node.userData.type === 'tree') {
+    G.resources.wood += 2;
+    showDamageNumber(node.position, '+2 🪵', '#8B4513');
+  } else if (node.userData.type === 'rock') {
+    G.resources.stone += 2;
+    showDamageNumber(node.position, '+2 🪨', '#888888');
+  } else if (node.userData.type === 'bush' && node.userData.harvestable) {
+    G.resources.food += 1;
+    showDamageNumber(node.position, '+1 🍖', '#ff6644');
+    node.userData.harvestable = false;
+    node.scale.set(0.5, 0.5, 0.5);
+    setTimeout(() => { node.userData.harvestable = true; node.scale.set(1, 1, 1); }, 10000);
+  }
+  updateHUD();
+}
+
+function pickUpNearest() {
+  let nearest = null, minDist = 4;
+  resources3D.forEach(r => {
+    if (!r.userData.alive) return;
+    const dx = r.position.x - playerMesh.position.x;
+    const dz = r.position.z - playerMesh.position.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    if (dist < minDist) { minDist = dist; nearest = r; }
+  });
+  if (nearest) {
+    const res = nearest.userData;
+    G.resources[res.resType] += res.amount;
+    showDamageNumber(nearest.position, `+${res.amount}`, '#ffd700');
+    nearest.userData.alive = false;
+    scene.remove(nearest);
+    addToInventory(res.resType, res.amount);
+    updateHUD();
+  }
+}
+
+function addToInventory(type, amount) {
+  const existing = G.inventory.find(i => i.type === type);
+  if (existing) {
+    existing.amount += amount;
+  } else {
+    G.inventory.push({ type, amount });
+  }
+}
+
 function buildBase() {
-    const base = new THREE.Group();
+  if (G.base) {
+    notify('🏠 基地已經建造了！');
+    return;
+  }
+  if (G.resources.wood < 10 || G.resources.stone < 5) {
+    notify('❌ 需要 🪵x10 🪨x5 來建造基地');
+    return;
+  }
+  G.resources.wood -= 10;
+  G.resources.stone -= 5;
+  createBaseMesh();
+  G.baseHP = G.baseMaxHP;
+  document.getElementById('baseInfo').style.display = 'block';
+  notify('🏠 基地建造完成！');
+  updateHUD();
+}
 
-    // 底座
-    base.add(makeMesh(new THREE.CylinderGeometry(2.5, 3, 0.8, 8), 0x888888, [0, 0.4, 0], true));
+function healAtBase() {
+  if (!G.base) {
+    notify('❌ 還沒有基地！按 B 建造');
+    return;
+  }
+  const dx = G.base.x - playerMesh.position.x;
+  const dz = G.base.z - playerMesh.position.z;
+  const dist = Math.sqrt(dx * dx + dz * dz);
+  if (dist > 10) {
+    notify('❌ 離基地太遠了！');
+    return;
+  }
+  if (G.resources.food < 2) {
+    notify('❌ 需要 🍖x2 來回血');
+    return;
+  }
+  G.resources.food -= 2;
+  G.playerHP = G.playerMaxHP;
+  notify('❤️ 生命值已回滿！');
+  updateHUD();
+}
 
-    // 鐵砧
-    base.add(makeMesh(new THREE.BoxGeometry(1.2, 1, 1.2), 0x555555, [0, 1.3, 0], true));
-
-    // 光環
-    const ring = new THREE.Mesh(
-        new THREE.RingGeometry(2.8, 3.4, 32),
-        new THREE.MeshBasicMaterial({color: 0xFFD700, transparent: true, opacity: 0.3, side: THREE.DoubleSide})
-    );
-    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05;
-    base.add(ring); base.userData.ring = ring;
-
-    // 光柱
-    const glow = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.2, 0.6, 5, 8),
-        new THREE.MeshBasicMaterial({color: 0xFFD700, transparent: true, opacity: 0.12})
-    );
-    glow.position.y = 3.5; base.add(glow); base.userData.glow = glow;
-
-    // 欄柵
-    const fm = new THREE.MeshLambertMaterial({color: 0x8B6914});
-    const fr = 4.5;
-    for (let i = 0; i < 16; i++) {
-        const a = (i / 16) * Math.PI * 2;
-        const px = Math.cos(a) * fr, pz = Math.sin(a) * fr;
-        base.add(makeMesh(new THREE.CylinderGeometry(0.08,0.08,1.8,6), 0x8B6914, [px, 0.9, pz], true));
-        if (i > 0) {
-            const pa = ((i-1)/16) * Math.PI * 2;
-            const dx = px - Math.cos(pa)*fr, dz = pz - Math.sin(pa)*fr;
-            const len = Math.sqrt(dx*dx + dz*dz);
-            const mx = Math.cos((a+pa)/2)*fr, mz = Math.sin((a+pa)/2)*fr;
-            const ry = -Math.atan2(dz, dx);
-            const rail1 = makeMesh(new THREE.BoxGeometry(len, 0.08, 0.06), 0x8B6914, [mx, 0.5, mz]);
-            rail1.rotation.y = ry; base.add(rail1);
-            const rail2 = makeMesh(new THREE.BoxGeometry(len, 0.08, 0.06), 0x8B6914, [mx, 1.3, mz]);
-            rail2.rotation.y = ry; base.add(rail2);
+function switchWeapon(idx) {
+  if (idx >= WEAPONS.length) return;
+  if (!unlockedWeapons[idx]) {
+    const w = WEAPONS[idx];
+    if (w.cost) {
+      let canAfford = true;
+      for (const [res, amt] of Object.entries(w.cost)) {
+        if ((G.resources[res] || 0) < amt) canAfford = false;
+      }
+      if (canAfford) {
+        for (const [res, amt] of Object.entries(w.cost)) {
+          G.resources[res] -= amt;
         }
+        unlockedWeapons[idx] = true;
+        currentWeapon = idx;
+        notify(`🔓 解鎖 ${w.icon} ${w.name}！`);
+        updateHUD();
+      } else {
+        let costStr = Object.entries(w.cost).map(([r,n]) => `${getResourceIcon(r)}x${n}`).join(' ');
+        notify(`❌ 需要 ${costStr} 來解鎖 ${w.name}`);
+      }
+    }
+  } else {
+    currentWeapon = idx;
+    notify(`⚔️ 切換至 ${WEAPONS[idx].icon} ${WEAPONS[idx].name}`);
+  }
+}
+
+function getResourceIcon(type) {
+  switch(type) {
+    case 'wood': return '🪵';
+    case 'stone': return '🪨';
+    case 'food': return '🍖';
+    case 'gold': return '💰';
+    default: return type;
+  }
+}
+
+// ==================== UI ====================
+function updateHUD() {
+  document.getElementById('resWood').textContent = G.resources.wood;
+  document.getElementById('resStone').textContent = G.resources.stone;
+  document.getElementById('resFood').textContent = G.resources.food;
+  document.getElementById('resGold').textContent = G.resources.gold;
+  document.getElementById('scoreVal').textContent = G.score;
+  document.getElementById('killVal').textContent = G.kills;
+  document.getElementById('atkVal').textContent = G.atk;
+  document.getElementById('defVal').textContent = G.def;
+
+  document.getElementById('hpFill').style.width = (G.playerHP / G.playerMaxHP * 100) + '%';
+  document.getElementById('healthVal').textContent = `${Math.ceil(G.playerHP)} / ${G.playerMaxHP}`;
+
+  if (G.base) {
+    document.getElementById('baseLvVal').textContent = G.baseLv;
+    document.getElementById('baseHpFill').style.width = (G.baseHP / G.baseMaxHP * 100) + '%';
+    document.getElementById('baseHpText').textContent = `${Math.ceil(G.baseHP)} / ${G.baseMaxHP}`;
+  }
+
+  updateInventoryUI();
+  updateUpgradeUI();
+}
+
+function updateInventoryUI() {
+  const slotsDiv = document.getElementById('invSlots');
+  slotsDiv.innerHTML = '';
+  const items = [
+    ...G.inventory.map(i => ({ icon: getResourceIcon(i.type), qty: i.amount })),
+  ];
+  // Add weapon display
+  WEAPONS.forEach((w, i) => {
+    if (unlockedWeapons[i]) {
+      items.push({ icon: w.icon, qty: i === currentWeapon ? '★' : '', active: i === currentWeapon });
+    }
+  });
+  for (let i = 0; i < 9; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'inv-slot';
+    if (items[i]) {
+      slot.textContent = items[i].icon;
+      if (items[i].qty) {
+        const qtyEl = document.createElement('span');
+        qtyEl.className = 'qty';
+        qtyEl.textContent = items[i].qty;
+        slot.appendChild(qtyEl);
+      }
+      if (items[i].active) slot.style.borderColor = '#ffd700';
+    }
+    slotsDiv.appendChild(slot);
+  }
+}
+
+function updateUpgradeUI() {
+  const list = document.getElementById('upgradeList');
+  list.innerHTML = '';
+  UPGRADES.forEach(upg => {
+    const item = document.createElement('div');
+    item.className = 'upgrade-item';
+
+    let costStr = '';
+    const cost = getUpgradeCost(upg);
+    for (const [res, amt] of Object.entries(cost)) {
+      costStr += `${getResourceIcon(res)}${amt} `;
     }
 
-    scene.add(base);
-    base.userData.ring = ring;
-    base.userData.glow = glow;
-    window._base = base;
+    const canAfford = checkAfford(cost);
+
+    item.innerHTML = `
+      <div class="info">
+        <div class="name">${upg.name} Lv.${upg.lv}/${upg.maxLv}</div>
+        <div class="desc">${upg.desc}</div>
+        <div class="cost">${upg.lv >= upg.maxLv ? '已滿級' : '費用: ' + costStr}</div>
+      </div>
+      <button class="upgrade-btn" ${upg.lv >= upg.maxLv || !canAfford ? 'disabled' : ''} onclick="doUpgrade('${upg.id}')">
+        ${upg.lv >= upg.maxLv ? 'MAX' : '升級'}
+      </button>
+    `;
+    list.appendChild(item);
+  });
 }
 
-/* ======== 升級花費Canvas ======== */
-let costCanvas = null;
-function makeCostCanvas(txt) {
-    const c = document.createElement('canvas');
-    c.width = 256; c.height = 128;
-    const x = c.getContext('2d');
-    x.fillStyle = 'rgba(0,0,0,0.85)';
-    x.fillRect(0, 0, 256, 128);
-    x.fillStyle = '#FFD700';
-    x.font = 'bold 56px Arial';
-    x.textAlign = 'center';
-    x.fillText(txt, 128, 70);
-    x.fillStyle = '#FF8888';
-    x.font = '26px Arial';
-    x.fillText('升級肉量', 128, 110);
-    return new THREE.CanvasTexture(c);
-}
-let costMesh = null;
-function addCostLabel() {
-    const tex = makeCostCanvas(uCost + '');
-    costMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.5, 1.2),
-        new THREE.MeshBasicMaterial({map: tex, transparent: true, side: THREE.DoubleSide})
-    );
-    costMesh.position.set(0, 2.5, 0.06);
-    window._base.add(costMesh);
-}
-addCostLabel();
-function updateCostLabel() {
-    if (costMesh) {
-        costMesh.material.map = makeCostCanvas(uCost + '');
-        costMesh.material.needsUpdate = true;
-    }
+function getUpgradeCost(upg) {
+  const cost = {};
+  for (const [res, base] of Object.entries(upg.baseCost)) {
+    cost[res] = Math.floor(base * Math.pow(upg.costMult, upg.lv));
+  }
+  return cost;
 }
 
-/* ======== 輔助：建立Mesh ======== */
-function makeMesh(geo, color, pos, shadow) {
-    const m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({color: color}));
-    m.position.set(pos[0], pos[1], pos[2]);
-    if (shadow) m.castShadow = true;
-    return m;
+function checkAfford(cost) {
+  for (const [res, amt] of Object.entries(cost)) {
+    if ((G.resources[res] || 0) < amt) return false;
+  }
+  return true;
 }
 
-/* ======== 玩家 ======== */
-function buildPlayer() {
-    const g = new THREE.Group();
-    const bm = new THREE.MeshLambertMaterial({color: 0x2266CC});
-    const sm = new THREE.MeshLambertMaterial({color: 0xFFD5B0});
-    const hm = new THREE.MeshLambertMaterial({color: 0x332211});
-    const pm = new THREE.MeshLambertMaterial({color: 0x334455});
-    const shoM = new THREE.MeshLambertMaterial({color: 0x553322});
-    const eM = new THREE.MeshLambertMaterial({color: 0x111111});
-    const ewM = new THREE.MeshLambertMaterial({color: 0xffffff});
-    const moM = new THREE.MeshLambertMaterial({color: 0xCC6666});
-
-    // 頭
-    g.add(makeMesh(new THREE.BoxGeometry(.7,.7,.7), 0xFFD5B0, [0,2.2,0], true));
-    // 頭髮
-    g.add(makeMesh(new THREE.BoxGeometry(.75,.35,.75), 0x332211, [0,2.55,0], true));
-    // 眼
-    g.add(makeMesh(new THREE.BoxGeometry(.1,.1,.05), 0x111111, [-.15,2.25,.36]));
-    g.add(makeMesh(new THREE.BoxGeometry(.1,.1,.05), 0x111111, [.15,2.25,.36]));
-    g.add(makeMesh(new THREE.BoxGeometry(.14,.14,.03), 0xffffff, [-.15,2.28,.37]));
-    g.add(makeMesh(new THREE.BoxGeometry(.14,.14,.03), 0xffffff, [.15,2.28,.37]));
-    // 嘴
-    g.add(makeMesh(new THREE.BoxGeometry(.2,.06,.05), 0xCC6666, [0,2.08,.36]));
-    // 身體
-    g.add(makeMesh(new THREE.BoxGeometry(.8,1,.5), 0x2266CC, [0,1.45,0], true));
-    // 手臂
-    const armL = makeMesh(new THREE.BoxGeometry(.25,.85,.25), 0x2266CC, [-.53,1.5,0], true);
-    const armR = makeMesh(new THREE.BoxGeometry(.25,.85,.25), 0x2266CC, [.53,1.5,0], true);
-    g.add(armL); g.add(armR);
-    // 手
-    g.add(makeMesh(new THREE.BoxGeometry(.2,.2,.2), 0xFFD5B0, [-.53,1.02,0]));
-    g.add(makeMesh(new THREE.BoxGeometry(.2,.2,.2), 0xFFD5B0, [.53,1.02,0]));
-    // 腿
-    const legL = makeMesh(new THREE.BoxGeometry(.32,.7,.32), 0x334455, [-.2,.55,0], true);
-    const legR = makeMesh(new THREE.BoxGeometry(.32,.7,.32), 0x334455, [.2,.55,0], true);
-    g.add(legL); g.add(legR);
-    // 鞋
-    g.add(makeMesh(new THREE.BoxGeometry(.32,.18,.42), 0x553322, [-.2,.1,.04]));
-    g.add(makeMesh(new THREE.BoxGeometry(.32,.18,.42), 0x553322, [.2,.1,.04]));
-
-    // 斧頭
-    const axeG = new THREE.Group();
-    const ah = new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.7,6), new THREE.MeshLambertMaterial({color:0x8B6914}));
-    ah.rotation.z = 0.3; axeG.add(ah);
-    const ab = new THREE.Mesh(new THREE.BoxGeometry(.3,.25,.06), new THREE.MeshLambertMaterial({color:0xAAAAAA}));
-    ab.position.set(.15,.3,0); axeG.add(ab);
-    axeG.position.set(.72, 1.7, 0);
-    g.add(axeG);
-
-    // HP 條 3D billboard
-    const hpBg = new THREE.Mesh(new THREE.PlaneGeometry(1.2,.15), new THREE.MeshBasicMaterial({color:0x333333, side:THREE.DoubleSide}));
-    hpBg.position.y = 3.3; g.add(hpBg);
-    const hpF = new THREE.Mesh(new THREE.PlaneGeometry(1.18,.13), new THREE.MeshBasicMaterial({color:0x44FF44, side:THREE.DoubleSide}));
-    hpF.position.y = 3.3; hpF.position.z = 0.01; g.add(hpF);
-
-    g.userData = {armL, armR, legL, legR, axeG, hpBg, hpF, wPh: 0};
-    return g;
-}
-
-/* ======== 熊 ======== */
-function buildBear(hpBonus) {
-    const b = new THREE.Group();
-    const bc = 0x8B4513, hc = 0x9B5523, bc2 = 0xD2B48C;
-
-    b.add(makeMesh(new THREE.BoxGeometry(1.6,1.4,1.2), bc, [0,1.3,0], true));
-    b.add(makeMesh(new THREE.BoxGeometry(1,.9,.1), bc2, [0,1.2,.65]));
-    b.add(makeMesh(new THREE.BoxGeometry(1.2,1.1,1), hc, [0,2.55,0], true));
-    b.add(makeMesh(new THREE.SphereGeometry(.3,8,8), hc, [-.45,3.1,0], true));
-    b.add(makeMesh(new THREE.SphereGeometry(.3,8,8), hc, [.45,3.1,0], true));
-    b.add(makeMesh(new THREE.SphereGeometry(.1,6,6), 0x111111, [-.25,2.65,.5]));
-    b.add(makeMesh(new THREE.SphereGeometry(.1,6,6), 0x111111, [.25,2.65,.5]));
-    b.add(makeMesh(new THREE.SphereGeometry(.06,6,6), 0xffffff, [-.23,2.68,.56]));
-    b.add(makeMesh(new THREE.SphereGeometry(.06,6,6), 0xffffff, [.27,2.68,.56]));
-    b.add(makeMesh(new THREE.BoxGeometry(.25,.15,.15), 0x222222, [0,2.45,.55]));
-    b.add(makeMesh(new THREE.BoxGeometry(.5,1,.5), bc, [-1.05,1.4,0], true));
-    b.add(makeMesh(new THREE.BoxGeometry(.5,1,.5), bc, [1.05,1.4,0], true));
-    b.add(makeMesh(new THREE.BoxGeometry(.5,.7,.6), bc, [-.45,.35,0], true));
-    b.add(makeMesh(new THREE.BoxGeometry(.5,.7,.6), bc, [.45,.35,0], true));
-    b.add(makeMesh(new THREE.BoxGeometry(.5,.3,.8), bc2, [-.45,.15,.1]));
-    b.add(makeMesh(new THREE.BoxGeometry(.5,.3,.8), bc2, [.45,.15,.1]));
-    b.add(makeMesh(new THREE.SphereGeometry(.18,6,6), bc, [0,1.5,-.7]));
-
-    // HP 條
-    const hpBg = new THREE.Mesh(new THREE.PlaneGeometry(1.6,.2), new THREE.MeshBasicMaterial({color:0x333333, side:THREE.DoubleSide}));
-    hpBg.position.y = 3.7; b.add(hpBg);
-    const hpF = new THREE.Mesh(new THREE.PlaneGeometry(1.58,.17), new THREE.MeshBasicMaterial({color:0xFF3333, side:THREE.DoubleSide}));
-    hpF.position.y = 3.7; hpF.position.z = 0.01; b.add(hpF);
-
-    const baseHP = 30 + (hpBonus || 0);
-    b.userData = {
-        hp: baseHP, mHP: baseHP, hpF, hpBg,
-        dying: false, hit: false, chase: false,
-        atkCD: 0, hitT: 0, spawnT: Date.now(), spawning: true, bob: Math.random()*6.28
-    };
-    return b;
-}
-
-function spawnBear() {
-    const bonus = Math.floor(uLv / 2) * 10;
-    const b = buildBear(bonus);
-    const h = MAP / 2 - 5;
-    let x, z, tries = 0;
-    do { x = (Math.random()-.5)*h*2; z = (Math.random()-.5)*h*2; tries++; }
-    while (tooClose(x,z) && tries < 50);
-    b.position.set(x, 0, z);
-    b.rotation.y = Math.random() * Math.PI * 2;
-    b.scale.set(0, 0, 0);
-    scene.add(b); bears.push(b);
-}
-
-function tooClose(x, z) {
-    for (const b of bears) {
-        const dx = b.position.x-x, dz = b.position.z-z;
-        if (Math.sqrt(dx*dx + dz*dz) < 5) return true;
-    }
-    return false;
-}
-
-/* ======== 自動攻擊（AOE）======== */
-function tryAtk() {
-    if (attacking || dead) return;
-    const now = Date.now();
-    if (now - lastAtk < atkCD) return;
-
-    const targets = [];
-    for (const b of bears) {
-        if (b.userData.dying || b.userData.hit) continue;
-        if (player.position.distanceTo(b.position) < atkRange) targets.push(b);
-    }
-    if (!targets.length) return;
-
-    attacking = true; lastAtk = now;
-    player.userData.atkTargets = targets;
-    player.userData.atkStart = now;
-    player.userData.atkDur = 600;
-
-    // 面向最近的熊
-    const near = targets[0];
-    const dir = new THREE.Vector3().subVectors(near.position, player.position);
-    dir.y = 0;
-    player.rotation.y = Math.atan2(dir.x, dir.z);
-}
-
-function onAtkHit(targets) {
-    for (const b of targets) {
-        if (b.userData.dying || b.userData.hit) continue;
-        b.userData.hp -= atk;
-        showDmg(b.position, atk);
-        spawnHitFx(b.position.clone().add(new THREE.Vector3(0, 1.5, 0)));
-
-        const ratio = Math.max(0, b.userData.hp / b.userData.mHP);
-        b.userData.hpF.scale.x = ratio;
-        b.userData.hpF.position.x = -(1 - ratio) * 0.79;
-
-        if (b.userData.hp <= 0) {
-            b.userData.hit = true;
-            b.userData.hitT = Date.now();
-            b.userData.hitD = 500;
-            document.getElementById('kCount').textContent = parseInt(document.getElementById('kCount').textContent) + 1;
-        }
-    }
-}
-
-/* ======== 熊攻擊玩家 ======== */
-function bearAI(dt) {
-    if (dead) return;
-    const now = Date.now();
-    for (const b of bears) {
-        if (b.userData.dying || b.userData.hit) continue;
-        const dist = player.position.distanceTo(b.position);
-        if (dist < 7) b.userData.chase = true;
-        if (dist > 12) b.userData.chase = false;
-
-        if (b.userData.chase) {
-            const dir = new THREE.Vector3().subVectors(player.position, b.position);
-            dir.y = 0; dir.normalize();
-            b.position.x += dir.x * 4.5 * dt;
-            b.position.z += dir.z * 4.5 * dt;
-            b.rotation.y = Math.atan2(dir.x, dir.z);
-            const lim = MAP / 2 - 3;
-            b.position.x = Math.max(-lim, Math.min(lim, b.position.x));
-            b.position.z = Math.max(-lim, Math.min(lim, b.position.z));
-
-            if (dist < 1.8 && now > b.userData.atkCD) {
-                b.userData.atkCD = now + 1200;
-                const dmg = 8 + Math.floor(Math.random() * 5);
-                hp -= dmg;
-                showDmg(player.position, dmg, true);
-                player.userData.hpF.scale.x = Math.max(0, hp / maxHP);
-                if (hp <= 0) { hp = 0; gameOver(); }
-            }
-        }
-    }
-}
-
-/* ======== 特效 ======== */
-function showDmg(pos, val, isPlayer) {
-    const p = pos.clone(); p.y = 3.5;
-    p.project(cam);
-    const sx = (p.x * .5 + .5) * innerWidth;
-    const sy = (-p.y * .5 + .5) * innerHeight;
-    const el = document.createElement('div');
-    el.className = 'dmgFloat';
-    el.textContent = '-' + val;
-    el.style.left = sx + 'px'; el.style.top = sy + 'px';
-    el.style.color = isPlayer ? '#ef4444' : '#FFD700';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 700);
-}
-
-function spawnHitFx(pos) {
-    const flash = new THREE.Mesh(new THREE.SphereGeometry(.8,8,8), new THREE.MeshBasicMaterial({color:0xFFFF00, transparent:true, opacity:.8}));
-    flash.position.copy(pos); scene.add(flash);
-    const ps = [];
-    for (let i = 0; i < 6; i++) {
-        const p = new THREE.Mesh(new THREE.BoxGeometry(.15,.15,.15), new THREE.MeshBasicMaterial({color:0xFF8800, transparent:true}));
-        p.position.copy(pos);
-        p.userData.vel = new THREE.Vector3((Math.random()-.5)*4, Math.random()*3+1, (Math.random()-.5)*4);
-        scene.add(p); ps.push(p);
-    }
-    const t0 = Date.now();
-    (function anim() {
-        const t = (Date.now() - t0) / 500;
-        if (t >= 1) { scene.remove(flash); ps.forEach(p => scene.remove(p)); return; }
-        flash.scale.set(1+t*2, 1+t*2, 1+t*2); flash.material.opacity = .8*(1-t);
-        ps.forEach(p => { p.position.add(p.userData.vel.clone().multiplyScalar(.016)); p.userData.vel.y -= 9.8*.016; p.material.opacity = 1-t; p.scale.setScalar(1-t*.5); });
-        requestAnimationFrame(anim);
-    })();
-}
-
-function killBear(b) {
-    b.userData.dying = true;
-    b.userData.deathT = Date.now();
-    b.userData.deathP = b.position.clone();
-    spawnMeat(b.position.clone());
-    bears.splice(bears.indexOf(b), 1);
-    setTimeout(spawnBear, 500);
-}
-
-function spawnMeat(pos) {
-    const mg = new THREE.Group();
-    mg.add(new THREE.Mesh(new THREE.BoxGeometry(.5,.5,.5), new THREE.MeshLambertMaterial({color:0xCC2222})));
-    const m2 = new THREE.Mesh(new THREE.BoxGeometry(.35,.35,.35), new THREE.MeshLambertMaterial({color:0xEE3333}));
-    m2.position.set(.25,.25,0); mg.add(m2);
-    mg.position.set(pos.x, 0.5, pos.z);
-    mg.scale.set(0, 0, 0);
-    scene.add(mg);
-    const md = {mesh: mg, spawnT: Date.now(), collected: false, startP: mg.position.clone(), flyT: null};
-    meats.push(md);
-    setTimeout(() => { if (!md.collected) { md.flyT = Date.now(); md.collected = true; } }, 400);
-}
-
-/* ======== 升級 ======== */
-window.toggleUp = function() {
-    const p = document.getElementById('upPanel');
-    if (p.style.display === 'block') { closeUp(); return; }
-    p.style.display = 'block';
-    document.getElementById('uLv').textContent = 'Lv.' + uLv;
-    document.getElementById('uAtk').textContent = atk;
-    document.getElementById('uRange').textContent = atkRange.toFixed(1);
-    document.getElementById('uMHP').textContent = maxHP;
-    document.getElementById('uCost').textContent = uCost;
-    document.getElementById('upBtn').disabled = meat < uCost;
+window.doUpgrade = function(id) {
+  const upg = UPGRADES.find(u => u.id === id);
+  if (!upg || upg.lv >= upg.maxLv) return;
+  const cost = getUpgradeCost(upg);
+  if (!checkAfford(cost)) return;
+  for (const [res, amt] of Object.entries(cost)) {
+    G.resources[res] -= amt;
+  }
+  upg.lv++;
+  upg.effect();
+  notify(`⬆️ ${upg.name} 升至 Lv.${upg.lv}！`);
+  updateHUD();
 };
-window.closeUp = function() { document.getElementById('upPanel').style.display = 'none'; };
-window.doUp = function() {
-    if (meat < uCost) return;
-    meat -= uCost; uLv++; atk += 10;
-    atkRange = 2 + uLv * 0.3;
-    maxHP += 15; hp = Math.min(hp + 25, maxHP);
-    uCost = Math.floor(uCost * 1.8);
-    document.getElementById('mCount').textContent = meat;
-    player.userData.hpF.scale.x = hp / maxHP;
-    updateCostLabel();
 
-    const fx = document.createElement('div');
-    fx.className = 'upgFx';
-    fx.textContent = '⬆️ Lv.' + uLv + '! ATK:' + atk;
-    document.body.appendChild(fx);
-    setTimeout(() => fx.remove(), 1800);
+function toggleInventory() {
+  const inv = document.getElementById('inventory');
+  inv.style.display = inv.style.display === 'none' ? 'block' : 'none';
+}
 
-    player.userData.axeG.scale.set(1 + uLv*0.1, 1 + uLv*0.1, 1 + uLv*0.1);
-    closeUp();
-};
+function toggleUpgrade() {
+  const panel = document.getElementById('upgradePanel');
+  G.paused = panel.style.display === 'block';
+  panel.style.display = panel.style.display === 'none' || !panel.style.display ? 'block' : 'none';
+  updateUpgradeUI();
+}
+
+function closePanels() {
+  document.getElementById('upgradePanel').style.display = 'none';
+  document.getElementById('inventory').style.display = 'none';
+  G.paused = false;
+}
+
+function showDamageNumber(pos, text, color) {
+  const div = document.createElement('div');
+  div.className = 'dmg-num';
+  div.style.color = color || '#fff';
+  div.textContent = typeof text === 'number' ? `-${text}` : text;
+  document.body.appendChild(div);
+
+  // Project 3D pos to screen
+  const v = new THREE.Vector3(pos.x, pos.y + 2.5, pos.z);
+  v.project(camera);
+  div.style.left = ((v.x + 1) / 2 * window.innerWidth) + 'px';
+  div.style.top = ((-v.y + 1) / 2 * window.innerHeight) + 'px';
+
+  setTimeout(() => div.remove(), 1000);
+}
+
+function showWaveInfo(text) {
+  const el = document.getElementById('waveInfo');
+  el.textContent = text;
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  el.offsetHeight; // Trigger reflow
+  el.style.animation = 'waveAnim 3s forwards';
+  setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+function notify(text) {
+  const div = document.createElement('div');
+  div.className = 'notification';
+  div.textContent = text;
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 2000);
+}
+
+function createParticle(x, y, z, color) {
+  const geo = new THREE.SphereGeometry(0.1, 4, 4);
+  const mat = new THREE.MeshBasicMaterial({ color });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(x, y + 1, z);
+  mesh.userData = {
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: Math.random() * 0.2 + 0.1,
+    vz: (Math.random() - 0.5) * 0.3,
+    life: 1,
+  };
+  scene.add(mesh);
+  particles3D.push(mesh);
+}
+
+// ==================== MINIMAP ====================
+function updateMinimap() {
+  const canvas = document.getElementById('minimapCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 150, 150);
+
+  const scale = 150 / (worldSize * 2);
+  const cx = 75, cy = 75;
+  const px = playerMesh.position.x;
+  const pz = playerMesh.position.z;
+
+  // Background
+  ctx.fillStyle = 'rgba(58,125,58,0.5)';
+  ctx.beginPath();
+  ctx.arc(75, 75, 73, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Base
+  if (G.base) {
+    const bx = cx + (G.base.x - px) * scale;
+    const by = cy + (G.base.z - pz) * scale;
+    ctx.fillStyle = '#4488ff';
+    ctx.fillRect(bx - 3, by - 3, 6, 6);
+  }
+
+  // Bears
+  bears.forEach(bear => {
+    if (!bear.userData.alive) return;
+    const bx = cx + (bear.position.x - px) * scale;
+    const by = cy + (bear.position.z - pz) * scale;
+    if (bx < 0 || bx > 150 || by < 0 || by > 150) return;
+    ctx.fillStyle = bear.userData.isBoss ? '#ff0000' : '#ff6644';
+    ctx.beginPath();
+    ctx.arc(bx, by, bear.userData.isBoss ? 4 : 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Resources
+  resources3D.forEach(r => {
+    if (!r.userData.alive) return;
+    const rx = cx + (r.position.x - px) * scale;
+    const ry = cy + (r.position.z - pz) * scale;
+    if (rx < 0 || rx > 150 || ry < 0 || ry > 150) return;
+    ctx.fillStyle = '#ffd700';
+    ctx.fillRect(rx - 1, ry - 1, 2, 2);
+  });
+
+  // Player
+  ctx.fillStyle = '#44ff44';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Direction indicator
+  const dirX = cx + Math.sin(cameraAngle) * -8;
+  const dirY = cy + Math.cos(cameraAngle) * -8;
+  ctx.strokeStyle = '#44ff44';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(dirX, dirY);
+  ctx.stroke();
+
+  // Border
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(75, 75, 73, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+// ==================== MAIN GAME LOOP ====================
+function gameLoop() {
+  if (!G.running) {
+    requestAnimationFrame(gameLoop);
+    renderer.render(scene, camera);
+    return;
+  }
+
+  const delta = clock.getDelta();
+
+  if (!G.paused) {
+    updatePlayer(delta);
+    updateBears(delta);
+    updateResources3D(delta);
+    updateParticles3D(delta);
+    updateBase(delta);
+    updateRegen(delta);
+    updateCamera();
+    updateMinimap();
+
+    if (G.attackCooldown > 0) {
+      G.attackCooldown -= delta;
+      if (G.attackCooldown <= 0) G.canAttack = true;
+    }
+  }
+
+  updateHUD();
+  renderer.render(scene, camera);
+  requestAnimationFrame(gameLoop);
+}
+
+function updatePlayer(delta) {
+  let dx = 0, dz = 0;
+  if (keys['w'] || keys['arrowup']) dz -= 1;
+  if (keys['s'] || keys['arrowdown']) dz += 1;
+  if (keys['a'] || keys['arrowleft']) dx -= 1;
+  if (keys['d'] || keys['arrowright']) dx += 1;
+
+  if (dx !== 0 || dz !== 0) {
+    const len = Math.sqrt(dx * dx + dz * dz);
+    dx /= len; dz /= len;
+
+    // Rotate movement by camera angle
+    const sin = Math.sin(cameraAngle);
+    const cos = Math.cos(cameraAngle);
+    const rdx = dx * cos - dz * sin;
+    const rdz = dx * sin + dz * cos;
+
+    playerMesh.position.x += rdx * G.moveSpeed;
+    playerMesh.position.z += rdz * G.moveSpeed;
+
+    // Face movement direction
+    playerMesh.rotation.y = Math.atan2(rdx, rdz);
+
+    // Clamp to world
+    playerMesh.position.x = Math.max(-worldSize, Math.min(worldSize, playerMesh.position.x));
+    playerMesh.position.z = Math.max(-worldSize, Math.min(worldSize, playerMesh.position.z));
+  }
+
+  // Bob animation
+  playerMesh.position.y = Math.sin(Date.now() * 0.005) * 0.1;
+}
+
+function updateBears(delta) {
+  bears.forEach(bear => {
+    if (!bear.userData.alive) return;
+
+    // Move toward player
+    const dx = playerMesh.position.x - bear.position.x;
+    const dz = playerMesh.position.z - bear.position.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+
+    if (dist > 2) {
+      bear.position.x += (dx / dist) * bear.userData.speed;
+      bear.position.z += (dz / dist) * bear.userData.speed;
+    }
+
+    // Face player
+    bear.rotation.y = Math.atan2(dx, dz);
+
+    // Bob
+    bear.position.y = Math.sin(Date.now() * 0.003 + bear.position.x) * 0.15;
+
+    // Attack player
+    if (dist < 2.5) {
+      bear.userData.attackCD -= delta;
+      if (bear.userData.attackCD <= 0) {
+        bear.userData.attackCD = 1;
+        const dmg = Math.max(1, bear.userData.dmg - G.def);
+        G.playerHP -= dmg;
+        showDamageNumber(playerMesh.position, dmg, '#ff0000');
+        if (G.playerHP <= 0) {
+          G.playerHP = 0;
+          gameOver();
+        }
+      }
+    } else {
+      bear.userData.attackCD = Math.min(bear.userData.attackCD, 0.5);
+    }
+
+    // Update HP bar
+    if (bear.userData.hpBarFill) {
+      const hpRatio = bear.userData.hp / bear.userData.maxHP;
+      bear.userData.hpBarFill.scale.x = Math.max(0.01, hpRatio);
+      bear.userData.hpBarFill.position.x = -(1 - hpRatio) * 0.6;
+      bear.userData.hpBarBg.lookAt(camera.position);
+      bear.userData.hpBarFill.lookAt(camera.position);
+    }
+
+    // Attack base
+    if (G.base) {
+      const bdx = G.base.x - bear.position.x;
+      const bdz = G.base.z - bear.position.z;
+      const bDist = Math.sqrt(bdx * bdx + bdz * bdz);
+      if (bDist < 5) {
+        G.baseHP -= bear.userData.dmg * delta * 0.5;
+        if (G.baseHP <= 0) {
+          G.baseHP = 0;
+          G.base = null;
+          scene.remove(baseMesh);
+          baseMesh = null;
+          document.getElementById('baseInfo').style.display = 'none';
+          notify('🏠 基地被摧毀了！');
+        }
+      }
+    }
+  });
+}
+
+function updateResources3D(delta) {
+  resources3D.forEach(r => {
+    if (!r.userData.alive) return;
+    r.userData.bobPhase += delta * 3;
+    r.children[0].position.y = 0.8 + Math.sin(r.userData.bobPhase) * 0.2;
+    r.children[0].rotation.y += delta * 2;
+  });
+}
+
+function updateParticles3D(delta) {
+  for (let i = particles3D.length - 1; i >= 0; i--) {
+    const p = particles3D[i];
+    p.position.x += p.userData.vx;
+    p.position.y += p.userData.vy;
+    p.position.z += p.userData.vz;
+    p.userData.vy -= 0.01;
+    p.userData.life -= delta * 2;
+    p.scale.setScalar(Math.max(0, p.userData.life));
+    if (p.userData.life <= 0) {
+      scene.remove(p);
+      particles3D.splice(i, 1);
+    }
+  }
+}
+
+function updateBase(delta) {
+  // Base doesn't need per-frame update unless damaged
+}
+
+function updateRegen(delta) {
+  const regenLv = UPGRADES.find(u => u.id === 'regen').lv;
+  if (regenLv > 0) {
+    regenTimer += delta;
+    if (regenTimer >= 5) {
+      regenTimer = 0;
+      G.playerHP = Math.min(G.playerMaxHP, G.playerHP + regenLv * 3);
+    }
+  }
+}
+
+function updateCamera() {
+  const targetX = playerMesh.position.x + Math.sin(cameraAngle) * cameraDistance;
+  const targetZ = playerMesh.position.z + Math.cos(cameraAngle) * cameraDistance;
+  const targetY = cameraPitch * cameraDistance;
+
+  camera.position.x += (targetX - camera.position.x) * 0.08;
+  camera.position.y += (targetY - camera.position.y) * 0.08;
+  camera.position.z += (targetZ - camera.position.z) * 0.08;
+
+  camera.lookAt(
+    playerMesh.position.x,
+    playerMesh.position.y + 1.5,
+    playerMesh.position.z
+  );
+}
 
 function gameOver() {
-    dead = true;
-    document.getElementById('goScore').textContent = meat + ' 🥩';
-    document.getElementById('goScreen').style.display = 'flex';
-}
-window.restart = function() {
-    dead = false; hp = 100; maxHP = 100; atk = 15;
-    uLv = 1; uCost = 5; meat = 0; atkRange = 2;
-    player.position.set(0, 0, 5); player.rotation.y = 0;
-    player.userData.hpF.scale.x = 1;
-    player.userData.axeG.scale.set(1,1,1);
-    bears.forEach(b => scene.remove(b)); bears.length = 0;
-    meats.forEach(m => scene.remove(m.mesh)); meats.length = 0;
-    document.getElementById('kCount').textContent = 0;
-    document.getElementById('mCount').textContent = 0;
-    document.getElementById('goScreen').style.display = 'none';
-    updateCostLabel();
-    for (let i = 0; i < 8; i++) spawnBear();
-};
+  G.running = false;
+  document.exitPointerLock();
 
-/* ======== 觸控 ======== */
-function setupJoy() {
-    const ja = document.getElementById('joyArea');
-    const jt = document.getElementById('joyThumb');
-    const JR = 40; let jc = {x:0, y:0};
-
-    document.addEventListener('touchstart', e => {
-        for (let i = 0; i < e.changedTouches.length; i++) {
-            const t = e.changedTouches[i];
-            const el = document.elementFromPoint(t.clientX, t.clientY);
-            if (el && (el === ja || ja.contains(el))) {
-                e.preventDefault();
-                joyId = t.identifier; joyActive = true;
-                const r = ja.getBoundingClientRect();
-                jc = {x: r.left + r.width/2, y: r.top + r.height/2};
-                uJoy(t.clientX, t.clientY); continue;
-            }
-            if (t.clientX > innerWidth / 2 && camId === null) {
-                camId = t.identifier; lastTX = t.clientX; lastTY = t.clientY;
-            }
-        }
-    }, {passive: false});
-
-    document.addEventListener('touchmove', e => {
-        for (let i = 0; i < e.touches.length; i++) {
-            if (e.touches[i].identifier === joyId) { e.preventDefault(); uJoy(e.touches[i].clientX, e.touches[i].clientY); }
-            if (e.touches[i].identifier === camId) {
-                e.preventDefault();
-                camAngle -= (e.touches[i].clientX - lastTX) * .005;
-                lastTX = e.touches[i].clientX; lastTY = e.touches[i].clientY;
-            }
-        }
-    }, {passive: false});
-
-    document.addEventListener('touchend', e => {
-        for (let i = 0; i < e.changedTouches.length; i++) {
-            if (e.changedTouches[i].identifier === joyId) { joyId = null; joyActive = false; joyIn.x = 0; joyIn.y = 0; jt.style.transform = 'translate(-50%,-50%)'; }
-            if (e.changedTouches[i].identifier === camId) camId = null;
-        }
-    }, {passive: false});
-
-    function uJoy(tx, ty) {
-        let dx = tx - jc.x, dy = ty - jc.y, d = Math.sqrt(dx*dx+dy*dy);
-        if (d > JR) { dx = dx/d*JR; dy = dy/d*JR; }
-        jt.style.transform = 'translate(calc(-50%+' + dx + 'px),calc(-50%+' + dy + 'px))';
-        joyIn.x = dx / JR; joyIn.y = dy / JR;
-    }
+  const div = document.createElement('div');
+  div.style.cssText = `
+    position:fixed;inset:0;z-index:50;
+    background:rgba(0,0,0,0.9);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+  `;
+  div.innerHTML = `
+    <div style="font-size:60px;margin-bottom:20px;">💀</div>
+    <div style="color:#ff4444;font-size:36px;font-weight:bold;margin-bottom:10px;">遊戲結束</div>
+    <div style="color:#ffd700;font-size:18px;margin:5px;">分數: ${G.score}</div>
+    <div style="color:#aaa;font-size:16px;margin:5px;">擊殺: ${G.kills} 隻熊</div>
+    <div style="color:#aaa;font-size:16px;margin:5px;">波數: ${G.wave}</div>
+    <div style="color:#aaa;font-size:16px;margin:5px;">基地等級: Lv.${G.baseLv}</div>
+    <button onclick="location.reload()" style="
+      margin-top:30px;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;
+      border:none;padding:14px 40px;border-radius:12px;cursor:pointer;
+      font-size:18px;font-weight:bold;font-family:inherit;
+    ">重新開始</button>
+  `;
+  document.body.appendChild(div);
 }
 
-/* ======== 主循環 ======== */
-let lastT = Date.now();
-function loop() {
-    requestAnimationFrame(loop);
-    const now = Date.now(), dt = Math.min((now - lastT) / 1000, .05);
-    lastT = now;
+// ==================== GAME START ====================
+function startGame() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('healthBar').style.display = 'block';
+  document.getElementById('bottomBar').style.display = 'flex';
+  document.getElementById('minimap').style.display = 'block';
 
-    // 玩家移動
-    if (!dead) {
-        const md = new THREE.Vector3();
-        if (!attacking) {
-            if (keys['w'] || keys['arrowup']) md.z -= 1;
-            if (keys['s'] || keys['arrowdown']) md.z += 1;
-            if (keys['a'] || keys['arrowleft']) md.x -= 1;
-            if (keys['d'] || keys['arrowright']) md.x += 1;
-            if (joyActive && (Math.abs(joyIn.x) > .1 || Math.abs(joyIn.y) > .1)) { md.x += joyIn.x; md.z += joyIn.y; }
-        }
+  G.running = true;
+  initThree();
+  createBaseMesh();
+  document.getElementById('baseInfo').style.display = 'block';
 
-        if (md.length() > 0) {
-            md.normalize();
-            const cDir = new THREE.Vector3(); cam.getWorldDirection(cDir); cDir.y = 0; cDir.normalize();
-            const cRight = new THREE.Vector3().crossVectors(cDir, new THREE.Vector3(0,1,0)).normalize();
-            const wm = new THREE.Vector3().addScaledVector(cRight, md.x).addScaledVector(cDir, -md.z).normalize();
-            player.position.x += wm.x * SPEED * dt;
-            player.position.z += wm.z * SPEED * dt;
-            const lim = MAP/2-2;
-            player.position.x = Math.max(-lim, Math.min(lim, player.position.x));
-            player.position.z = Math.max(-lim, Math.min(lim, player.position.z));
+  // Give starting resources
+  G.resources.wood = 5;
+  G.resources.stone = 3;
+  G.resources.food = 3;
+  G.resources.gold = 0;
 
-            if (!attacking) {
-                const ta = Math.atan2(wm.x, wm.z);
-                let d = ta - player.rotation.y;
-                while (d > Math.PI) d -= Math.PI*2;
-                while (d < -Math.PI) d += Math.PI*2;
-                player.rotation.y += d * .15;
-            }
+  // First wave after delay
+  setTimeout(spawnWave, 3000);
 
-            player.userData.wPh = (player.userData.wPh || 0) + dt * 10;
-            const ph = player.userData.wPh, parts = player.userData;
-            parts.legL.position.z = Math.sin(ph) * .15;
-            parts.legR.position.z = Math.sin(ph + Math.PI) * .15;
-            parts.armL.rotation.x = Math.sin(ph + Math.PI) * .3;
-            parts.armR.rotation.x = Math.sin(ph) * .3;
-            player.position.y = Math.abs(Math.sin(ph)) * .1;
-        } else {
-            const parts = player.userData;
-            parts.legL.position.z *= .85;
-            parts.legR.position.z *= .85;
-            parts.armL.rotation.x *= .85;
-            parts.armR.rotation.x *= .85;
-            player.position.y *= .9;
-        }
+  // Spawn some initial resource nodes
+  for (let i = 0; i < 30; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 10 + Math.random() * 60;
+    const types = ['wood', 'stone', 'food'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    createResourceDrop(Math.cos(angle) * dist, Math.sin(angle) * dist, type, 1 + Math.floor(Math.random() * 3));
+  }
 
-        // 攻擊動畫
-        if (attacking) {
-            const ae = now - player.userData.atkStart;
-            const ap = Math.min(ae / player.userData.atkDur, 1);
-            const parts = player.userData;
-            if (ap < .3) { const t = ap/.3; parts.axeG.rotation.z = -t*.8; parts.armR.rotation.x = -t*.6; }
-            else if (ap < .6) { const t = (ap-.3)/.3; parts.axeG.rotation.z = -.8+t*2; parts.armR.rotation.x = -.6+t*1.2; if (t > .3 && !player.userData.hitDone) { player.userData.hitDone = true; onAtkHit(player.userData.atkTargets); } }
-            else { const t = (ap-.6)/.4; parts.axeG.rotation.z = 1.2*(1-t); parts.armR.rotation.x = .6*(1-t); }
-            if (ap >= 1) {
-                attacking = false; player.userData.hitDone = false; player.userData.atkTargets = null;
-                parts.axeG.rotation.z = 0; parts.armR.rotation.x = 0;
-            }
-        }
+  updateHUD();
 
-        tryAtk();
-        bearAI(dt);
-
-        // 基地偵測
-        nearBase = player.position.distanceTo(new THREE.Vector3(0,0,0)) < 4.5;
-        const tipEl = document.getElementById('tip');
-        tipEl.innerHTML = nearBase
-            ? '<b>WASD</b> 移動 | <b>E</b> 開啟升級 | 靠近熊自動攻擊'
-            : '<b>WASD</b> 移動 | 走到熊旁自動攻擊 | 靠近基地按 <b>E</b> 升級';
-
-        // HUD
-        document.getElementById('hpText').textContent = 'HP ' + Math.max(0,hp) + '/' + maxHP;
-        document.getElementById('hpInner').style.width = Math.max(0, hp/maxHP*100) + '%';
-        document.getElementById('hpInner').style.background = hp <= 50
-            ? 'linear-gradient(90deg,#f87171,#ef4444)' : 'linear-gradient(90deg,#4ade80,#22c55e)';
+  // Request pointer lock on first click
+  document.getElementById('gameCanvas').addEventListener('click', () => {
+    if (G.running && !G.paused) {
+      document.getElementById('gameCanvas').requestPointerLock();
     }
-
-    // 攝影機
-    const ox = Math.sin(camAngle) * CAM_D * Math.cos(CAM_PITCH);
-    const oz = Math.cos(camAngle) * CAM_D * Math.cos(CAM_PITCH);
-    const oy = CAM_H * Math.sin(CAM_PITCH) + 5;
-    cam.position.lerp(new THREE.Vector3(player.position.x+ox, player.position.y+oy, player.position.z+oz), .1);
-    cam.lookAt(player.position.x, player.position.y+1.5, player.position.z);
-
-    // 基地動畫
-    const base = window._base;
-    if (base) {
-        base.userData.ring.material.opacity = .2 + Math.sin(now*.003)*.15;
-        base.userData.glow.material.opacity = .1 + Math.sin(now*.002)*.08;
-        if (nearBase) base.userData.ring.material.opacity = .5 + Math.sin(now*.008)*.3;
-    }
-
-    // 熊動畫
-    for (let i = bears.length - 1; i >= 0; i--) {
-        const b = bears[i];
-        if (b.userData.spawning) {
-            const t = (now - b.userData.spawnT) / 500;
-            if (t >= 1) { b.scale.set(1,1,1); b.userData.spawning = false; }
-            else { const s = eOB(t); b.scale.set(s,s,s); }
-        }
-        if (b.userData.hit && !b.userData.dying) {
-            const t = (now - b.userData.hitT) / b.userData.hitD;
-            if (t >= 1) { killBear(b); continue; }
-            const e = t * t;
-            b.rotation.x = e * Math.PI/2;
-            b.position.y = -e * .5;
-            b.scale.set(1 - e*.3, 1 - e*.3, 1 - e*.3);
-            b.traverse(ch => {
-                if (ch.isMesh && ch.material && !ch.userData.oc) ch.userData.oc = ch.material.color.clone();
-                if (ch.isMesh && ch.userData.oc) ch.material.color.lerp(new THREE.Color(0xFF2222), e * .6);
-            });
-            continue;
-        }
-        if (b.userData.dying) {
-            const t = (now - b.userData.deathT) / 400;
-            if (t >= 1) { scene.remove(b); } else {
-                const s = 1-t; b.scale.set(s,s,s);
-                b.position.y = b.userData.deathP.y + t*2;
-                b.rotation.y += .15;
-            }
-            continue;
-        }
-        if (!b.userData.chase) {
-            b.userData.bob += .02;
-            b.position.y = Math.sin(b.userData.bob) * .05;
-        }
-        // HP billboard
-        b.userData.hpBg.lookAt(cam.position);
-        b.userData.hpF.lookAt(cam.position);
-    }
-
-    // 玩家 HP billboard
-    player.userData.hpBg.lookAt(cam.position);
-    player.userData.hpF.lookAt(cam.position);
-
-    // 掉落物
-    for (let i = meats.length - 1; i >= 0; i--) {
-        const m = meats[i];
-        if (!m.collected) {
-            const t = (now - m.spawnT) / 300;
-            if (t >= 1) m.mesh.scale.set(1,1,1); else m.mesh.scale.set(eOB(t), eOB(t), eOB(t));
-            m.mesh.position.y = .5 + Math.sin(now*.005)*.15;
-            m.mesh.rotation.y += .03;
-        }
-        if (m.collected && m.flyT) {
-            const el = (now - m.flyT) / 1000;
-            if (el >= 1) {
-                scene.remove(m.mesh); meats.splice(i, 1);
-                meat++; document.getElementById('mCount').textContent = meat;
-            } else {
-                const p = eIOC(el);
-                const endP = new THREE.Vector3(player.position.x, 10, player.position.z);
-                const midP = m.startP.clone(); midP.y += 5;
-                const t1 = m.startP.clone().lerp(midP, p);
-                const t2 = midP.clone().lerp(endP, p);
-                m.mesh.position.copy(t1.lerp(t2, p));
-                m.mesh.rotation.x += .1; m.mesh.rotation.z += .08;
-                const s = 1 - p*.5; m.mesh.scale.set(s,s,s);
-                m.mesh.traverse(c => { if (c.isMesh && c.material) { c.material.transparent = true; c.material.opacity = 1-p*.5; } });
-            }
-        }
-    }
-
-    ren.render(scene, cam);
+  });
 }
 
-/* ======== 緩動 ======== */
-function eOB(t) { return 1 + 2.70158 * Math.pow(t-1,3) + 1.70158 * Math.pow(t-1,2); }
-function eIOC(t) { return t<.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
-
-document.addEventListener('gesturestart', e => e.preventDefault());
+// Start render loop
+gameLoop();
 </script>
 </body>
 </html>
