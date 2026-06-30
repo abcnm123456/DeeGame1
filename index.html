@@ -200,7 +200,7 @@
             canvas.width=256;canvas.height=128;
             const ctx=canvas.getContext('2d');
             ctx.fillStyle='rgba(0,0,0,0.8)';
-            ctx.beginPath();ctx.roundRect(0,0,256,128,12);ctx.fill();
+            ctx.fillRect(0,0,256,128);
             ctx.fillStyle='#FFD700';ctx.font='bold 50px Arial';ctx.textAlign='center';
             ctx.fillText(upgradeCost,128,50);
             ctx.fillStyle='#FF6666';ctx.font='30px Arial';
@@ -224,7 +224,7 @@
             canvas.width=256;canvas.height=128;
             const ctx=canvas.getContext('2d');
             ctx.fillStyle='rgba(0,0,0,0.85)';
-            ctx.beginPath();ctx.roundRect(0,0,256,128,12);ctx.fill();
+            ctx.fillRect(0,0,256,128);
             ctx.fillStyle='#FFD700';ctx.font='bold 60px Arial';ctx.textAlign='center';
             ctx.fillText(upgradeCost+'',128,60);
             ctx.fillStyle='#FF8888';ctx.font='28px Arial';
