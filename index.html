@@ -1006,8 +1006,14 @@
                 const distToPlayer = player.position.distanceTo(bear.position);
                 if (distToPlayer < 8 && distToPlayer > 2) {
                     const awayDir = new THREE.Vector3().subVectors(bear.position, player.position).normalize();
-                    bear.position.x += awayDir.x * 4 * dt;
-                    bear.position.z += awayDir.z * 4 * dt;
+                    const newX = bear.position.x + awayDir.x * 4 * dt;
+                    const newZ = bear.position.z + awayDir.z * 4 * dt;
+                    const limit = GROUND_SIZE / 2 - 3;
+                    // 確保熊不會逃出地圖邊界
+                    if (newX > -limit && newX < limit && newZ > -limit && newZ < limit) {
+                        bear.position.x = newX;
+                        bear.position.z = newZ;
+                    }
                     bear.rotation.y = Math.atan2(awayDir.x, awayDir.z);
                 }
             }
